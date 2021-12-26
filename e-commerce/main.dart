@@ -7,7 +7,7 @@ enum UserType{customer,personel}
 void main(List<String> args) {
   Interface.createAllObject();
 
-  Interface.Star();
+  Interface.Start();
 }
 
 
@@ -15,7 +15,7 @@ void main(List<String> args) {
 //bu fonksiyonları statik mi yapmalıyım yoksa mainin içinde tanımlıyıp mı kullanmalıyım
 
 class Interface {
-  static Star(){
+  static Start(){
     LoginState loginState = LoginState.unselected;
 
     while(loginState != LoginState.exit){  
