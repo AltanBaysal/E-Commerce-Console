@@ -7,11 +7,12 @@ late UserType selectedUserType;
 
 enum CardType{CreditCard,BankCard}
 
-void main(List<String> args) {
-  
-  Interface.createAllObject();
+enum PaymentMethods{CreditCard,BankCard,Cash,Debt} 
 
+void main(List<String> args) {
+  Interface.createAllObject();
   Interface.Start();
+  
 }
 
 
@@ -77,64 +78,153 @@ class Interface {
 
 
   static createAllObject(){
-    for(var i=1;i<11;i++){
-      Objectcreator.productcreator("productName$i", i, i*10);
-    }
+    
   }
 }
 
-
 class Objectcreator{
-  static productcreator(String productName,int numberOfProduct,double priceOfProduct){
+  static productcreator(ProductType productType,String productName,int numberOfProduct,double priceOfProduct){
     int listIndex = products.length;
-    Product newProduct = Product(productName, listIndex, numberOfProduct, priceOfProduct);
-    products.add(newProduct);
+
+    switch(productType){
+      case ProductType.Candy:{
+        Candy newproduct = Candy(productName, listIndex, numberOfProduct, priceOfProduct);
+        products.add(newproduct);
+      }
+      break;
+      case ProductType.Chips:{
+        Chips newproduct = Chips(productName, listIndex, numberOfProduct, priceOfProduct);
+        products.add(newproduct);
+      }
+      break;
+      case ProductType.Chocolate:{
+        Chocolate newproduct = Chocolate(productName, listIndex, numberOfProduct, priceOfProduct);
+        products.add(newproduct);
+      }
+      break;
+      case ProductType.Cookies:{
+        Cookies newproduct = Cookies(productName, listIndex, numberOfProduct, priceOfProduct);
+        products.add(newproduct);
+      }
+      break;
+      case ProductType.Crakers:{
+        Crakers newproduct = Crakers(productName, listIndex, numberOfProduct, priceOfProduct);
+        products.add(newproduct);
+      }
+      break;
+      case ProductType.FruitSnacks:{
+        FruitSnacks newproduct = FruitSnacks(productName, listIndex, numberOfProduct, priceOfProduct);
+        products.add(newproduct);
+      }
+      break;
+      case ProductType.IceCream:{
+        IceCream newproduct = IceCream(productName, listIndex, numberOfProduct, priceOfProduct);
+        products.add(newproduct);
+      }
+      break;
+      case ProductType.Juice:{
+        Juice newproduct = Juice(productName, listIndex, numberOfProduct, priceOfProduct);
+        products.add(newproduct);
+      }
+      break;
+      case ProductType.PopCorn:{
+        PopCorn newproduct = PopCorn(productName, listIndex, numberOfProduct, priceOfProduct);
+        products.add(newproduct);
+      }
+      break;
+      case ProductType.SnackNuts:{
+        SnackNuts newproduct = SnackNuts(productName, listIndex, numberOfProduct, priceOfProduct);
+        products.add(newproduct);
+      }
+      break;
+    }
   }
-  
+
+  static customercreator(String username,double cash){
+    int listIndex = customers.length;
+    Customer newcustomer = Customer(cash, username,listIndex);
+    customers.add(newcustomer);
+  }
 }
 
 
 
 //User
-abstract class User{
+
+class User{
+  late String _username;
+  late UserType _usertype;
+  late int _index;
+
+  String get username => _username;
+  UserType get usertype => _usertype;
+  int get index => _index;
 
 }
 
 List<Customer> customers =[];
 class Customer implements User{
-  UserType usertype = UserType.customer;
-  double cash;
+  
+  String _username;
+  UserType _usertype = UserType.customer;
+  int _index;
+  double _cash;
+  double _totalDebt =0;
 
-  Customer(this.cash);
+  List<Card> cards =[];
+  
+
+  String get username => _username;
+  UserType get usertype => _usertype;
+  int get index => _index;
+  double get cash => _cash;
+  double get totalDebt => _totalDebt;
+  
+  Customer(this._cash,this._username,this._index);
+
+  void addCard(CardType cardType,int _cardNumber,int _pin,double _balance){
+    int listIndex = cards.length;
+
+    switch (cardType){
+      case CardType.CreditCard:{
+        CreditCard newCard = CreditCard(_cardNumber, _pin, _balance,listIndex);
+        cards.add(newCard);
+      }
+      break;
+      case CardType.BankCard :{
+        BankCard newCard = BankCard(_cardNumber, _pin, _balance,listIndex);
+        cards.add(newCard);
+      }
+      break;
+    }
+  }
+  
 }
+
 
 List<Personel> personels = [];
 class Personel implements User{
-  UserType usertype = UserType.personel;
+  String _username;
+  UserType _usertype = UserType.personel;
+  int _index;
+  String password;
 
+  String get username => _username;
+  UserType get usertype => _usertype;
+  int get index => _index;
+
+  Personel(this._username,this._index,this.password);
 }
 
-/*
-mixin enterPassword{
-  late int _pin; 
-  
-  bool PasswordChecker(int passowrd){
-    if(_pin == passowrd){
-      return true;
-    }
-    return false;
-  }
-}*/
 
 
 
-
-
-//Cards
+//Cards +
 class Card {
   late int _cardNumber;  
   late int _pin;
   late double _balance;
+  late int _index;
 
   bool _isCardBlocked = false;
 
@@ -146,6 +236,7 @@ class Card {
   int get pin => _pin;
   double get balance => _balance;
   bool get isCardBlocked => _isCardBlocked;
+  int get index => _index;
 
   
 
@@ -181,10 +272,10 @@ class Card {
 
 class CreditCard implements Card{
   CardType cardType = CardType.CreditCard;
-
   int _cardNumber;
   int _pin;
   double _balance;
+  int _index;
 
   bool _isCardBlocked = false;
 
@@ -195,8 +286,9 @@ class CreditCard implements Card{
   int get pin => _pin;
   double get balance => _balance;
   bool get isCardBlocked => _isCardBlocked;
+  int get index => _index;
 
-  CreditCard(this._cardNumber,this._pin,this._balance);  
+  CreditCard(this._cardNumber,this._pin,this._balance,this._index);  
 
   @override
   bool PasswordChecker(int passowrd) {
@@ -233,6 +325,7 @@ class BankCard implements Card{
   int _cardNumber;
   int _pin;
   double _balance;
+  int _index;
 
   bool _isCardBlocked = false;
 
@@ -243,8 +336,10 @@ class BankCard implements Card{
   int get pin => _pin;
   double get balance => _balance;
   bool get isCardBlocked => _isCardBlocked;
+  int get index => _index;
 
-  BankCard(this._cardNumber,this._pin,this._balance);  
+
+  BankCard(this._cardNumber,this._pin,this._balance,this._index);  
 
   @override
   bool PasswordChecker(int passowrd) {
@@ -279,16 +374,17 @@ class BankCard implements Card{
 
 
 
-//Products
+
+//Product +
 List<Product> products =[];
+enum ProductType{Chips,Crakers,Cookies,SnackNuts,Chocolate,FruitSnacks,IceCream,Candy,PopCorn,Juice}
+
 class Product{
-  String _productName;
-  int _listIndex; 
+  late String _productName;
+  late int _listIndex; 
 
-  int _numberOfProduct;
-  double _priceOfProduct;
-
-  Product(this._productName,this._listIndex,this._numberOfProduct,this._priceOfProduct);
+  late int _numberOfProduct;
+  late double _priceOfProduct;
 
 
   //setter
@@ -300,6 +396,15 @@ class Product{
     this._priceOfProduct = priceOfProduct;
   }
 
+  bool isThereEnoughProduct(int desiredAmount){
+    if(desiredAmount<= _numberOfProduct) return true;
+    else return false;
+  }
+
+  void productReduction(int amountToBeReduce){
+    _numberOfProduct -= amountToBeReduce;
+  }
+
 
   //getters
   String get productName => _productName;
@@ -309,7 +414,388 @@ class Product{
 }
 
 
+class Chips implements Product{
+  ProductType productType = ProductType.Chips;
+  String _productName;
+  int _listIndex; 
 
+  int _numberOfProduct;
+  double _priceOfProduct;
+
+  Chips(this._productName, this._listIndex,this._numberOfProduct,this._priceOfProduct);
+
+  
+
+  //getters
+  String get productName => _productName;
+  int get numberOfProduct => _numberOfProduct;
+  double get priceOfProduct => _priceOfProduct;
+  int get listIndex => _listIndex;
+
+
+  @override
+  void setnumberOfProduct(int numberOfProduct) {
+    this._numberOfProduct = numberOfProduct;
+  }
+
+  @override
+  void setpriceOfProduct(double priceOfProduct) {
+    this._priceOfProduct = priceOfProduct;
+  }
+
+  @override
+  bool isThereEnoughProduct(int desiredAmount) {
+    if(desiredAmount<= _numberOfProduct) return true;
+    else return false;
+  }
+
+  @override
+  void productReduction(int amountToBeReduce) {
+    _numberOfProduct -= amountToBeReduce;
+  } 
+}
+
+class Crakers implements Product{
+  ProductType productType = ProductType.Crakers;
+  int _listIndex;
+  int _numberOfProduct;
+  double _priceOfProduct;
+  String _productName;
+
+
+  Crakers(this._productName, this._listIndex,this._numberOfProduct,this._priceOfProduct);
+
+
+  String get productName => _productName;
+  int get numberOfProduct => _numberOfProduct;
+  double get priceOfProduct => _priceOfProduct;
+  int get listIndex => _listIndex; 
+
+  @override
+  void setnumberOfProduct(int numberOfProduct) {
+    this._numberOfProduct = numberOfProduct;
+  }
+
+  @override
+  void setpriceOfProduct(double priceOfProduct) {
+    this._priceOfProduct = priceOfProduct;
+  } 
+
+  @override
+  bool isThereEnoughProduct(int desiredAmount) {
+    if(desiredAmount<= _numberOfProduct) return true;
+    else return false;
+  }
+
+  @override
+  void productReduction(int amountToBeReduce) {
+    _numberOfProduct -= amountToBeReduce;
+  } 
+}
+
+class Cookies implements Product{
+  ProductType productType = ProductType.Cookies;
+  int _listIndex;
+  int _numberOfProduct;
+  double _priceOfProduct;
+  String _productName;
+
+
+  Cookies(this._productName, this._listIndex,this._numberOfProduct,this._priceOfProduct);
+
+
+  String get productName => _productName;
+  int get numberOfProduct => _numberOfProduct;
+  double get priceOfProduct => _priceOfProduct;
+  int get listIndex => _listIndex; 
+
+  @override
+  void setnumberOfProduct(int numberOfProduct) {
+    this._numberOfProduct = numberOfProduct;
+  }
+
+  @override
+  void setpriceOfProduct(double priceOfProduct) {
+    this._priceOfProduct = priceOfProduct;
+  } 
+
+  @override
+  bool isThereEnoughProduct(int desiredAmount) {
+    if(desiredAmount<= _numberOfProduct) return true;
+    else return false;
+  }
+
+  @override
+  void productReduction(int amountToBeReduce) {
+    _numberOfProduct -= amountToBeReduce;
+  } 
+}
+
+class SnackNuts implements Product{
+  ProductType productType = ProductType.SnackNuts;
+  int _listIndex;
+  int _numberOfProduct;
+  double _priceOfProduct;
+  String _productName;
+
+
+  SnackNuts(this._productName, this._listIndex,this._numberOfProduct,this._priceOfProduct);
+
+
+  String get productName => _productName;
+  int get numberOfProduct => _numberOfProduct;
+  double get priceOfProduct => _priceOfProduct;
+  int get listIndex => _listIndex; 
+
+  @override
+  void setnumberOfProduct(int numberOfProduct) {
+    this._numberOfProduct = numberOfProduct;
+  }
+
+  @override
+  void setpriceOfProduct(double priceOfProduct) {
+    this._priceOfProduct = priceOfProduct;
+  } 
+
+  @override
+  bool isThereEnoughProduct(int desiredAmount) {
+    if(desiredAmount<= _numberOfProduct) return true;
+    else return false;
+  }
+
+  @override
+  void productReduction(int amountToBeReduce) {
+    _numberOfProduct -= amountToBeReduce;
+  } 
+}
+
+class Chocolate implements Product{
+  ProductType productType = ProductType.Chocolate;
+  int _listIndex;
+  int _numberOfProduct;
+  double _priceOfProduct;
+  String _productName;
+
+
+  Chocolate(this._productName, this._listIndex,this._numberOfProduct,this._priceOfProduct);
+
+
+  String get productName => _productName;
+  int get numberOfProduct => _numberOfProduct;
+  double get priceOfProduct => _priceOfProduct;
+  int get listIndex => _listIndex; 
+
+  @override
+  void setnumberOfProduct(int numberOfProduct) {
+    this._numberOfProduct = numberOfProduct;
+  }
+
+  @override
+  void setpriceOfProduct(double priceOfProduct) {
+    this._priceOfProduct = priceOfProduct;
+  } 
+
+  @override
+  bool isThereEnoughProduct(int desiredAmount) {
+    if(desiredAmount<= _numberOfProduct) return true;
+    else return false;
+  }
+
+  @override
+  void productReduction(int amountToBeReduce) {
+    _numberOfProduct -= amountToBeReduce;
+  } 
+}
+
+class FruitSnacks implements Product{
+  ProductType productType = ProductType.FruitSnacks;
+  int _listIndex;
+  int _numberOfProduct;
+  double _priceOfProduct;
+  String _productName;
+
+
+  FruitSnacks(this._productName, this._listIndex,this._numberOfProduct,this._priceOfProduct);
+
+
+  String get productName => _productName;
+  int get numberOfProduct => _numberOfProduct;
+  double get priceOfProduct => _priceOfProduct;
+  int get listIndex => _listIndex; 
+
+  @override
+  void setnumberOfProduct(int numberOfProduct) {
+    this._numberOfProduct = numberOfProduct;
+  }
+
+  @override
+  void setpriceOfProduct(double priceOfProduct) {
+    this._priceOfProduct = priceOfProduct;
+  } 
+
+  @override
+  bool isThereEnoughProduct(int desiredAmount) {
+    if(desiredAmount<= _numberOfProduct) return true;
+    else return false;
+  }
+
+  @override
+  void productReduction(int amountToBeReduce) {
+    _numberOfProduct -= amountToBeReduce;
+  } 
+}
+
+class IceCream implements Product{
+  ProductType productType = ProductType.IceCream;
+  int _listIndex;
+  int _numberOfProduct;
+  double _priceOfProduct;
+  String _productName;
+
+
+  IceCream(this._productName, this._listIndex,this._numberOfProduct,this._priceOfProduct);
+
+
+  String get productName => _productName;
+  int get numberOfProduct => _numberOfProduct;
+  double get priceOfProduct => _priceOfProduct;
+  int get listIndex => _listIndex; 
+
+  @override
+  void setnumberOfProduct(int numberOfProduct) {
+    this._numberOfProduct = numberOfProduct;
+  }
+
+  @override
+  void setpriceOfProduct(double priceOfProduct) {
+    this._priceOfProduct = priceOfProduct;
+  } 
+
+  @override
+  bool isThereEnoughProduct(int desiredAmount) {
+    if(desiredAmount<= _numberOfProduct) return true;
+    else return false;
+  }
+
+  @override
+  void productReduction(int amountToBeReduce) {
+    _numberOfProduct -= amountToBeReduce;
+  } 
+}
+
+class Candy implements Product{
+  ProductType productType = ProductType.Candy;
+  int _listIndex;
+  int _numberOfProduct;
+  double _priceOfProduct;
+  String _productName;
+
+
+  Candy(this._productName, this._listIndex,this._numberOfProduct,this._priceOfProduct);
+
+
+  String get productName => _productName;
+  int get numberOfProduct => _numberOfProduct;
+  double get priceOfProduct => _priceOfProduct;
+  int get listIndex => _listIndex; 
+
+  @override
+  void setnumberOfProduct(int numberOfProduct) {
+    this._numberOfProduct = numberOfProduct;
+  }
+
+  @override
+  void setpriceOfProduct(double priceOfProduct) {
+    this._priceOfProduct = priceOfProduct;
+  } 
+
+  @override
+  bool isThereEnoughProduct(int desiredAmount) {
+    if(desiredAmount<= _numberOfProduct) return true;
+    else return false;
+  }
+
+  @override
+  void productReduction(int amountToBeReduce) {
+    _numberOfProduct -= amountToBeReduce;
+  } 
+}
+
+class PopCorn implements Product{
+  ProductType productType = ProductType.PopCorn;
+  int _listIndex;
+  int _numberOfProduct;
+  double _priceOfProduct;
+  String _productName;
+
+
+  PopCorn(this._productName, this._listIndex,this._numberOfProduct,this._priceOfProduct);
+
+
+  String get productName => _productName;
+  int get numberOfProduct => _numberOfProduct;
+  double get priceOfProduct => _priceOfProduct;
+  int get listIndex => _listIndex; 
+
+  @override
+  void setnumberOfProduct(int numberOfProduct) {
+    this._numberOfProduct = numberOfProduct;
+  }
+
+  @override
+  void setpriceOfProduct(double priceOfProduct) {
+    this._priceOfProduct = priceOfProduct;
+  } 
+
+  @override
+  bool isThereEnoughProduct(int desiredAmount) {
+    if(desiredAmount<= _numberOfProduct) return true;
+    else return false;
+  }
+
+  @override
+  void productReduction(int amountToBeReduce) {
+    _numberOfProduct -= amountToBeReduce;
+  } 
+}
+
+class Juice implements Product{
+  ProductType productType = ProductType.Juice;
+  int _listIndex;
+  int _numberOfProduct;
+  double _priceOfProduct;
+  String _productName;
+
+
+  Juice(this._productName, this._listIndex,this._numberOfProduct,this._priceOfProduct);
+
+
+  String get productName => _productName;
+  int get numberOfProduct => _numberOfProduct;
+  double get priceOfProduct => _priceOfProduct;
+  int get listIndex => _listIndex; 
+
+  @override
+  void setnumberOfProduct(int numberOfProduct) {
+    this._numberOfProduct = numberOfProduct;
+  }
+
+  @override
+  void setpriceOfProduct(double priceOfProduct) {
+    this._priceOfProduct = priceOfProduct;
+  } 
+
+  @override
+  bool isThereEnoughProduct(int desiredAmount) {
+    if(desiredAmount<= _numberOfProduct) return true;
+    else return false;
+  }
+
+  @override
+  void productReduction(int amountToBeReduce) {
+    _numberOfProduct -= amountToBeReduce;
+  } 
+}
 
 
 /*
