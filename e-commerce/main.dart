@@ -1,27 +1,34 @@
 import 'dart:io';
 
-enum LoginState {customer,personel,exit,unselected}
+enum LoginState {customer,personel,exit,unselected} //?
+enum UserType{customer,personel} 
+
 
 void main(List<String> args) {
-  LoginState loginState;
+  Interface.createAllObject();
 
-  while(true){ 
-    Interface.printActions();
-    loginState = Interface.getActions();
-
-    print(loginState);
-    print("");
-
-    if(loginState == LoginState.exit) break;
-
-  }
+  Interface.Star();
 }
+
 
 
 //bu fonksiyonları statik mi yapmalıyım yoksa mainin içinde tanımlıyıp mı kullanmalıyım
 
 class Interface {
-  static printActions(){
+  static Star(){
+    LoginState loginState = LoginState.unselected;
+
+    while(loginState != LoginState.exit){  
+      Interface.printAction();
+      loginState = Interface.getActions();
+
+      if(loginState != LoginState.exit && loginState != LoginState.unselected) takeAction(loginState);
+      
+
+    }
+  }
+
+  static printAction(){
     print("Select your Action");
     print("For customer press 1");
     print("For personel press 2");
@@ -30,7 +37,6 @@ class Interface {
   
   static getActions(){
     
-
     String? action = stdin.readLineSync();
 
     switch(action!.toLowerCase()){
@@ -48,14 +54,44 @@ class Interface {
         return LoginState.unselected;
       }
     }
+
+
   }
+  
+  static takeAction(LoginState loginState){
+    if(loginState == LoginState.customer){
+      print("Customer");
+    }
+    else{
+      print("Personel");
+    }
+  }
+
+
+
+  static createAllObject(){
+    for(var i=1;i<11;i++){
+      Objectcreator.productcreator("productName$i", i, i*10);
+    }
+  }
+}
+
+
+
+class Objectcreator{
+  static productcreator(String productName,int numberOfProduct,double priceOfProduct){
+    int listIndex = products.length;
+    Product newProduct = Product(productName, listIndex, numberOfProduct, priceOfProduct);
+    products.add(newProduct);
+  }
+
 }
 
 
 
 
 
-
+List<Product> products =[];
 class Product{
   String _productName;
   int _listIndex; 
@@ -63,7 +99,7 @@ class Product{
   int _numberOfProduct;
   double _priceOfProduct;
 
-  Product(this._numberOfProduct,this._productName,this._priceOfProduct,this._listIndex);
+  Product(this._productName,this._listIndex,this._numberOfProduct,this._priceOfProduct);
 
 
   //setter
