@@ -33,7 +33,6 @@ class Customer implements User{
   
   Customer(this._cash,this._username,this._index);
 
-
   void addCard(CardType cardType,int _cardNumber,int _pin,double _balance){
     int listIndex = cards.length;
 
@@ -50,21 +49,22 @@ class Customer implements User{
       break;
     }
   }
-  
+
 
   int selectCard(){
     while(true){
-      cards.forEach((element) {
-        print("${element.cardNumber} - ${element.balance} - ${element.cardType.toString().split('.').elementAt(1)}");
-      });
-
+      printCardList();
+      print("For exit type exit");
       print("Enter credit card number");
-      int? cardNumber = int.tryParse(stdin.readLineSync().toString());
+      String action = stdin.readLineSync().toString();
+      if(action.toLowerCase() == "exit") return -1;
 
+      int? cardNumber = int.tryParse(action);
       if(cardNumber == null){
         print("Only numbers allowed");
         continue;
       }
+      
 
       List<Card> selectedCard = cards.where((element) => element.cardNumber == cardNumber).toList();
       
@@ -74,6 +74,12 @@ class Customer implements User{
         print("Enter valid action");
       }
     }
+  }
+
+  printCardList(){
+    cards.forEach((element) {
+        print("${element.cardNumber} - ${element.balance} - ${element.cardType.toString().split('.').elementAt(1)}");
+    });
   }
 
 
@@ -90,6 +96,7 @@ class Customer implements User{
 
   bool payByCard(double bill){
     int indexofCard = selectCard();
+    if(indexofCard == -1) return false;
     return cards[indexofCard].buy(bill);
   }
 

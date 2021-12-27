@@ -9,4 +9,8 @@ void main(List<String> args) {
 }
 
 
+//Personnel1 123456
+//Customer1
+//All cards' pin -> 1234
+
 

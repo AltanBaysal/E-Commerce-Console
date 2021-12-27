@@ -32,9 +32,11 @@ class Card {
       if(actions == null){
         print("Enter valid action");
       }
+
       else if(actions.toLowerCase() == "exit"){
         return false;
       }
+
       else{
         int? pin = int.tryParse(actions);
         if(pin == null){
@@ -42,12 +44,7 @@ class Card {
         }
         
         else if(PasswordChecker(pin)){
-          if(withdrawMoney(bill)){
-            return true;
-          }
-          else{
-            return false;
-          }
+          return withdrawMoney(bill);
         }
       }
     }
@@ -68,6 +65,7 @@ class Card {
       print("Transaction performed successfully");
       return true;
     }
+
     else{
       print("You don't have enough money in your card to pay");
       return false;
@@ -114,11 +112,11 @@ class CreditCard implements Card{
     while(true){
       print("For exit type exit");
       print("Enter pin");
+
       String? actions = stdin.readLineSync();
       if(actions == null){
-        throw Exception("actions cant be null");
+        print("Enter valid action");
       }
-      
       else if(actions.toLowerCase() == "exit"){
         return false;
       }
@@ -127,16 +125,13 @@ class CreditCard implements Card{
         if(pin == null){
            print("Only numbers allowed");
         }
-
+        
         else if(PasswordChecker(pin)){
-          withdrawMoney(bill);
-          return true;
+          return withdrawMoney(bill);
         }
-
       }
     }
   }
-
   @override
   bool PasswordChecker(int passowrd){
     if(_isCardBlocked){
@@ -210,11 +205,11 @@ class BankCard implements Card{
     while(true){
       print("For exit type exit");
       print("Enter pin");
+
       String? actions = stdin.readLineSync();
       if(actions == null){
-        throw Exception("actions cant be null");
+        print("Enter valid action");
       }
-      
       else if(actions.toLowerCase() == "exit"){
         return false;
       }
@@ -223,16 +218,14 @@ class BankCard implements Card{
         if(pin == null){
            print("Only numbers allowed");
         }
-
+        
         else if(PasswordChecker(pin)){
-          withdrawMoney(bill);
-          return true;
+          return withdrawMoney(bill);
         }
-
       }
     }
   }
-
+  
   @override
   bool PasswordChecker(int passowrd){
     if(_isCardBlocked){

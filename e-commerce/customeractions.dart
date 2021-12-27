@@ -11,7 +11,6 @@ class Customeractions{
   late int indexofcustomer;
   
 
-
   actionInterface(){
     bool islogin = login();
     
@@ -21,10 +20,13 @@ class Customeractions{
       indexofproduct = getNumber();
       if(indexofproduct == -1) break;
       
-      desiredAmount = getdesiredAmount();
+      while(true){
+        desiredAmount = getdesiredAmount();
       
-      if(products[indexofproduct].isThereEnoughProduct(desiredAmount)) {
-        selectPaymentMethods();
+        if(products[indexofproduct].isThereEnoughProduct(desiredAmount)) {
+          selectPaymentMethods();
+          break;
+        }
       }
     }
   }
@@ -45,7 +47,6 @@ class Customeractions{
       print("Username not found. Try again");
     }
   }
-
 
 
   int getdesiredAmount(){
@@ -124,7 +125,6 @@ class Customeractions{
   }
 
   bool buyProduct(PaymentMethods selectedPaymentMethods,double bill){
-    
     switch (selectedPaymentMethods){
       case PaymentMethods.Card :{
         if(customers[indexofcustomer].payByCard(bill)){
@@ -134,19 +134,25 @@ class Customeractions{
         return false;
       }
         
-      case PaymentMethods.Cash:
+      case PaymentMethods.Cash:{
         if(customers[indexofcustomer].payByCash(bill)){
           products[indexofproduct].productReduction(desiredAmount);
           return true;
         }
         return false;
-
-      case PaymentMethods.Debt:
+      }
+        
+      case PaymentMethods.Debt:{
         if(customers[indexofcustomer].payByDebt(bill)){
           products[indexofproduct].productReduction(desiredAmount);
           return true;
         }
         return false;
+      }
     }
   }
+
 }
+
+
+//fazla product number söyleyince tekrar product number sorsun
