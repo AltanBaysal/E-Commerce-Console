@@ -182,10 +182,8 @@ class Customeractions{
           print("Enter valid action");
         }
       }
-      print("sa");
 
       if(selectedPaymentMethods != null){
-        print("sa");
         if(buyProduct(selectedPaymentMethods,bill)) break;
       }
 
