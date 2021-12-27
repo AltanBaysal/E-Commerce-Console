@@ -2,45 +2,38 @@ import 'dart:io';
 
 enum State {selected,exit,unselected} 
 
-enum PersonnelActions{PrintProductTable,ChangeNumberOfProduct,CustomerDebt}
-
-
-//enum PaymentMethods{CreditCard,BankCard,Cash,Debt} //kullanımı yok
-
 void main(List<String> args) {
-  Objectcreator.createAllObject();
-  Interface.Start();
+  
+  newObjectcreator.createAllObject();
+  newInterface.Start();
+  
 }
 
 
-//bu fonksiyonları statik mi yapmalıyım yoksa mainin içinde tanımlıyıp mı kullanmalıyım
-
+Interface newInterface = Interface();
 class Interface {
-  static late UserType selectedUserType;
-  static late PersonnelActions selectedPersonnelActions;
+  late UserType selectedUserType;
   
-
-  static Start(){
+  Start(){
     State loginState = State.unselected;
 
     while(loginState != State.exit){  
-      Interface.printAction();
-      loginState = Interface.getActions();
+      printAction();
+      loginState = getActions();
 
       if(loginState == State.selected) takeAction();
-
       print("");
     }
   }
   
-  static printAction(){
+  printAction(){
     print("Select your Action");
     print("For customer press 1");
     print("For personnel press 2");
     print("For enter tpye exit");
   }
   
-  static getActions(){
+  getActions(){
     
     String? action = stdin.readLineSync();
 
@@ -65,41 +58,213 @@ class Interface {
 
   }
   
-  static takeAction(){
+  takeAction(){
     switch(selectedUserType){
       case UserType.customer:
-      customerActions();
+      newCustomeractions.actionInterface();
       break;
 
       case UserType.personnel:
-      personnelActionInteface();
+      newPersonnelactions.actionInterface();
       break;
     }
   }
 
+}
 
-//Custermer funcs
-  static customerActions(){
-    
+
+enum PaymentMethods{Card,Cash,Debt}
+Customeractions newCustomeractions = Customeractions();
+class Customeractions{
+  late int indexofproduct; 
+  late int desiredAmount;
+  late int indexofcustomer;
+  
+
+  actionInterface(){
+    bool islogin = login();
+    while(islogin){
+
+      printProductTable();
+      indexofproduct = getNumber();
+      if(indexofproduct == -1) break;
+      
+      desiredAmount = getdesiredAmount();
+      
+      if(products[indexofproduct].isThereEnoughProduct(desiredAmount)) {
+        selectPaymentMethods();
+      }
+    }
   }
 
+  bool login(){
+    while(true){
+      print("for exit type exit");
+      print("Enter username");
+      String username = stdin.readLineSync() ?? "";
 
-//Personnel funcs
-  static personnelActionInteface(){
-    State personnelActionState = State.unselected;
-    bool isLoggin = personnelLogin();
-    while(isLoggin && personnelActionState != State.exit){
+      if(username.toLowerCase() == "exit") return false;
 
-      personnelPrintActions();
-      personnelActionState = personnelGetActions();
-
-      if(personnelActionState == State.selected) takePersonnelAction();
-
-
+      List<Customer> personnel = customers.where((element) => element._username == username).toList();
+      if(personnel.isNotEmpty){
+        indexofcustomer =  personnel.first.index;
+        return true;
+      }
+      print("Username not found. Try again");
     }
   }
   
-  static personnelPrintActions(){
+
+  int getdesiredAmount(){
+    while(true){
+      print("Enter how many items you want to buy");  
+      int? desiredamount = int.tryParse(stdin.readLineSync().toString());
+    
+      if(desiredamount == null){
+        print("Only numbers allowed");
+      }
+      else if(desiredamount > 0){
+        return desiredamount;
+      }
+    }
+  }
+ 
+  int  getNumber(){
+    while(true){
+      print("For exit type exit");
+      print("Enter the product number you want to buy");  
+
+      String? action = stdin.readLineSync().toString();
+      if(action.toLowerCase() == "exit") return -1;
+
+      int? number = int.tryParse(action);
+
+      if(number == null){
+        print("Only numbers allowed");
+      }
+      else if(products.length>=number && number > 0){
+        return number-1;
+      }else{
+        print("enter valid number");
+      }
+    }
+  }
+
+
+  selectPaymentMethods(){
+    double priceOfProduct = products[indexofproduct].priceOfProduct;;
+    double bill = desiredAmount*priceOfProduct;
+
+    while(true){
+      PaymentMethods? selectedPaymentMethods;
+      print("Amount to be paid $bill");
+      print("Select a payment methods");
+      print("for card press 1");
+      print("for cash press 2  You have ${customers[indexofcustomer]._cash} cash");
+      print("for debt press 3");
+
+      int action = int.tryParse(stdin.readLineSync().toString()) ?? -1;
+
+      switch (action){
+        case 1:
+          selectedPaymentMethods = PaymentMethods.Card;
+        break;
+
+        case 2:
+          selectedPaymentMethods = PaymentMethods.Cash;
+        break;
+
+        case 3:
+          selectedPaymentMethods = PaymentMethods.Debt;
+        break;
+
+        default :{
+          print("Enter valid action");
+        }
+      }
+      print("sa");
+
+      if(selectedPaymentMethods != null){
+        print("sa");
+        if(buyProduct(selectedPaymentMethods,bill)) break;
+      }
+
+    }
+  }
+
+  bool buyProduct(PaymentMethods selectedPaymentMethods,double bill){
+    
+    switch (selectedPaymentMethods){
+      case PaymentMethods.Card :{
+        if(customers[indexofcustomer].payByCard(bill)){
+          products[indexofproduct].productReduction(desiredAmount);
+          return true;
+        }
+        return false;
+      }
+        
+      case PaymentMethods.Cash:
+        if(customers[indexofcustomer].payByCash(bill)){
+          products[indexofproduct].productReduction(desiredAmount);
+          return true;
+        }
+        return false;
+
+      case PaymentMethods.Debt:
+        if(customers[indexofcustomer].payByDebt(bill)){
+          products[indexofproduct].productReduction(desiredAmount);
+          return true;
+        }
+        return false;
+    }
+  }
+}
+
+
+enum PersonnelActions{PrintProductTable,ChangeNumberOfProduct,CustomerDebt}
+Personnelactions newPersonnelactions = Personnelactions();
+class Personnelactions{
+  late PersonnelActions selectedPersonnelActions;
+
+  actionInterface(){
+    State personnelActionState = State.unselected;
+    bool isLoggin = login();
+    while(isLoggin && personnelActionState != State.exit){
+
+      printActions();
+      personnelActionState = getAction();
+
+      if(personnelActionState == State.selected) takeAction();
+    }
+  }
+
+  bool login(){
+    while(true){
+      print("for exit type exit");
+      print("Enter username");
+      String username = stdin.readLineSync() ?? "";
+
+      if(username.toLowerCase() == "exit") return false;
+
+      List<Personnel> personnel = personnels.where((element) => element._username == username).toList();
+      if(personnel.isEmpty){
+        print("Username not found. Try again");
+        continue;
+      }
+
+      print("for exit type exit");
+      print("Enter password");
+      String password = stdin.readLineSync() ?? "";
+      if(password.toLowerCase() == "exit") return false;
+
+      if(!personnel.first.passwordChecker(password)) continue;
+
+      return true;
+    }
+
+  }
+  
+  printActions(){
     print("Select your Action");
     print("For print product table press 1");
     print("For change number of product press 2");
@@ -107,7 +272,7 @@ class Interface {
     print("For exit enter exit");
   }
   
-  static personnelGetActions(){
+  getAction(){
     
     String? action = stdin.readLineSync();
 
@@ -137,7 +302,7 @@ class Interface {
 
   }
 
-  static takePersonnelAction(){
+  takeAction(){
     switch (selectedPersonnelActions){
       case PersonnelActions.ChangeNumberOfProduct:
       changeNumberOfProduct();
@@ -154,36 +319,8 @@ class Interface {
   }
 
 
-  static bool personnelLogin(){
-    while(true){
-      print("for exit type exit");
-      print("Enter username");
-      String username = stdin.readLineSync() ?? "";
-
-      if(username.toLowerCase() == "exit") return false;
-
-      List<Personnel> personnel = personnels.where((element) => element._username == username).toList();
-      if(personnel.isEmpty){
-        print("Username not found. Try again");
-        continue;
-      }
-
-      print("for exit type exit");
-      print("Enter password");
-      String password = stdin.readLineSync() ?? "";
-      if(password.toLowerCase() == "exit") return false;
-
-      if(!personnel.first.passwordChecker(password)) continue;
-
-      return true;
-    }
-
-  }
-
-  
-
-  //bu iki fonksiyonu while a koy
-  static changeNumberOfProduct(){
+  //func
+  changeNumberOfProduct(){
     while(true){
       products.forEach((element) {
         print("${element.listIndex +1} - ${element.productName}");
@@ -205,7 +342,7 @@ class Interface {
       print("Enter new product number");
       int ? numberOfProduct = int.tryParse(stdin.readLineSync().toString());
       if(numberOfProduct == null){
-        print("just use numbers");
+        print("Only numbers allowed");
         continue;
       }
 
@@ -214,7 +351,7 @@ class Interface {
     }
   }
 
-  static getCustomerDebt(){
+  getCustomerDebt(){
     while(true){
       customers.forEach((element) {
         print("${element.index +1} - ${element.username}");
@@ -236,35 +373,28 @@ class Interface {
     }
   }
   
-  static printProductTable(){
-    print("Number - Product Name - Number Of Product - Price Of Product");
-
-    products.forEach((element) {
-      print("${element.listIndex+1} - ${element.productName} - ${element.numberOfProduct} - ${element.priceOfProduct}");
-    });
-  }
+  
 }
 
 
 
-
-
-
-
+Objectcreator newObjectcreator = Objectcreator();
 class Objectcreator{
-  static createAllObject(){
+  createAllObject(){
     customercreator("Customer1", 120);
-    Objectcreator.personnelcreator("Personnel1", "123456");
+    addCreditCard();
 
+    personnelcreator("Personnel1", "123456");
     var i =0;
     ProductType.values.forEach((type) {
       i++;
       String productname = type.toString().split('.').elementAt(1);
-      Objectcreator.productcreator(type, productname, i, i*10);
+      productcreator(type, productname, i, i*10);
     });
   }
   
-  static productcreator(ProductType productType,String productName,int numberOfProduct,double priceOfProduct){
+
+  productcreator(ProductType productType,String productName,int numberOfProduct,double priceOfProduct){
     int listIndex = products.length;
 
     switch(productType){
@@ -321,26 +451,30 @@ class Objectcreator{
     }
   }
 
-  static customercreator(String username,double cash){
+  customercreator(String username,double cash){
     int listIndex = customers.length;
     Customer newcustomer = Customer(cash, username,listIndex);
     customers.add(newcustomer);
   }
 
-  static personnelcreator(String username,String password){
+  personnelcreator(String username,String password){
     int listIndex = personnels.length;
     Personnel newpersonnel = Personnel(username, listIndex, password);
     personnels.add(newpersonnel);
   }
 
+  addCreditCard(){
+    customers.forEach((element) {
+      element.addCard(CardType.BankCard, 344541507145330, 1234, 500);
+      element.addCard(CardType.CreditCard, 344541507145331, 1234, 700);
+      element.addCard(CardType.CreditCard, 344541507145332, 1234, 800);
+    });
+  }
 }
 
 
 
-
-
-
-//User
+//User 
 enum UserType{customer,personnel}
 
 class User{
@@ -374,6 +508,7 @@ class Customer implements User{
   
   Customer(this._cash,this._username,this._index);
 
+
   void addCard(CardType cardType,int _cardNumber,int _pin,double _balance){
     int listIndex = cards.length;
 
@@ -391,6 +526,79 @@ class Customer implements User{
     }
   }
   
+  int selectCard(){
+    while(true){
+      cards.forEach((element) {
+        print("${element.cardNumber} - ${element.balance} - ${element.cardType.toString().split('.').elementAt(1)}");
+      });
+
+      print("Enter credit card number");
+      int? cardNumber = int.tryParse(stdin.readLineSync().toString());
+
+      if(cardNumber == null){
+        print("Only numbers allowed");
+        continue;
+      }
+
+      List<Card> selectedCard = cards.where((element) => element._cardNumber == cardNumber).toList();
+      
+      if(selectedCard.isNotEmpty){
+        return selectedCard.first._index;
+      }else{
+        print("Enter valid action");
+      }
+
+    }
+  }
+
+  bool payByCash(double bill){
+    if(bill<=_cash){
+      _cash -= bill;
+      print("Transaction performed successfully");
+      return true;
+    }else{
+      print("You don't have enough Cash to pay");
+      return false;
+    }
+  }
+
+  bool payByCard(double bill){
+    int indexofCard = selectCard();
+    return cards[indexofCard].buy(bill);
+  }
+
+  bool payByDebt(double bill){
+    if(!isThereEnoughMoney(bill)){
+      print("Transaction performed successfully");
+      _totalDebt += bill;
+      return true;
+    }
+    else{
+
+      return false;
+    }
+  }
+
+
+  bool isThereEnoughMoney(double bill){
+    if(_cash >= bill){
+      print("You have enough cash to pay");
+      return true;
+    }
+
+    bool isThereEnoughMoneyCard = false;
+    cards.forEach((element) {
+      if(element.balance >= bill){
+        isThereEnoughMoneyCard = true;
+      }
+    });
+    if(isThereEnoughMoneyCard){
+      print("You have enough money in your card to pay");
+      return true;
+    }
+
+    return false;
+  }
 }
 
 List<Personnel> personnels = [];
@@ -444,11 +652,12 @@ class Personnel implements User{
 
 
 
-
 //Cards 
+
 enum CardType{CreditCard,BankCard}
 
 class Card {
+  late CardType cardType;
   late int _cardNumber;  
   late int _pin;
   late double _balance;
@@ -466,8 +675,38 @@ class Card {
   bool get isCardBlocked => _isCardBlocked;
   int get index => _index;
 
-  
+  //geliştirmeli
 
+  bool buy(double bill){
+    while(true){
+      print("For exit type exit");
+      print("Enter pin");
+
+      String? actions = stdin.readLineSync();
+      if(actions == null){
+        print("Enter valid action");
+      }
+      
+      else if(actions.toLowerCase() == "exit"){
+        return false;
+      }
+      else{
+        int? pin = int.tryParse(actions);
+        if(pin == null){
+           print("Only numbers allowed");
+        }
+        
+        else if(PasswordChecker(pin)){
+          if(withdrawMoney(bill)){
+            return true;
+          }
+          else{
+            return false;
+          }
+        }
+      }
+    }
+  }
 
   bool PasswordChecker(int passowrd){
     if(_pin == passowrd){
@@ -478,12 +717,15 @@ class Card {
     return false;
   }
   
-  void withdrawMoney(int disbursement){
+  bool withdrawMoney(double disbursement){
     if(disbursement<=this._balance){
       this._balance -=disbursement;
+      print("Transaction performed successfully");
+      return true;
     }
     else{
       print("You don't have enough money in your card to pay");
+      return false;
     }
   }
  
@@ -500,7 +742,6 @@ class Card {
       _wrongEntries = 0;
     }
   }
-
 }
 
 class CreditCard implements Card{
@@ -524,6 +765,34 @@ class CreditCard implements Card{
   CreditCard(this._cardNumber,this._pin,this._balance,this._index);  
 
   @override
+  bool buy(double bill){
+    while(true){
+      print("For exit type exit");
+      print("Enter pin");
+      String? actions = stdin.readLineSync();
+      if(actions == null){
+        throw Exception("actions cant be null");
+      }
+      
+      else if(actions.toLowerCase() == "exit"){
+        return false;
+      }
+      else{
+        int? pin = int.tryParse(actions);
+        if(pin == null){
+           print("Only numbers allowed");
+        }
+
+        else if(PasswordChecker(pin)){
+          withdrawMoney(bill);
+          return true;
+        }
+
+      }
+    }
+  }
+
+  @override
   bool PasswordChecker(int passowrd){
     if(_isCardBlocked){
       print("your access blocked . You can't Login");
@@ -533,17 +802,21 @@ class CreditCard implements Card{
       wrongEntriesSetter(false);
       return true;
     }
+
     wrongEntriesSetter(true);
     return false;
   }
 
   @override
-  void withdrawMoney(int disbursement) {
+  bool withdrawMoney(double disbursement){
     if(disbursement<=this._balance){
       this._balance -=disbursement;
+      print("Transaction performed successfully");
+      return true;
     }
     else{
       print("You don't have enough money in your card to pay");
+      return false;
     }
   }
 
@@ -552,6 +825,7 @@ class CreditCard implements Card{
     
     if(isEntriesWrong){
       ++_wrongEntries;
+      print("Wrong password");
       print("remaining entry ${3 - _wrongEntries}");
       if(_wrongEntries >= 3){
         _isCardBlocked = true;
@@ -587,46 +861,91 @@ class BankCard implements Card{
   BankCard(this._cardNumber,this._pin,this._balance,this._index);  
 
   @override
-  bool PasswordChecker(int passowrd) {
+  bool buy(double bill){
+    while(true){
+      print("For exit type exit");
+      print("Enter pin");
+      String? actions = stdin.readLineSync();
+      if(actions == null){
+        throw Exception("actions cant be null");
+      }
+      
+      else if(actions.toLowerCase() == "exit"){
+        return false;
+      }
+      else{
+        int? pin = int.tryParse(actions);
+        if(pin == null){
+           print("Only numbers allowed");
+        }
+
+        else if(PasswordChecker(pin)){
+          withdrawMoney(bill);
+          return true;
+        }
+
+      }
+    }
+  }
+
+  @override
+  bool PasswordChecker(int passowrd){
     if(_isCardBlocked){
       print("your access blocked . You can't Login");
       return false;
     }
-
     if(_pin == passowrd){
       wrongEntriesSetter(false);
       return true;
     }
+    
     wrongEntriesSetter(true);
     return false;
   }
 
   @override
-  void withdrawMoney(int disbursement) {
+  bool withdrawMoney(double disbursement){
     if(disbursement<=this._balance){
       this._balance -=disbursement;
+      print("Transaction performed successfully");
+      return true;
     }
     else{
       print("You don't have enough money in your card to pay");
+      return false;
     }
   }
 
   @override
   void wrongEntriesSetter(bool isEntriesWrong) {
+    
     if(isEntriesWrong){
       ++_wrongEntries;
-      if(_wrongEntries >= 3) _isCardBlocked = true;
+      print("Wrong password");
+      print("remaining entry ${3 - _wrongEntries}");
+      if(_wrongEntries >= 3){
+        _isCardBlocked = true;
+        print("Your access has blocked");
+      }
     }
     else{
       _wrongEntries = 0;
     }
   }
+
 }
 
 
 
 
-//Product 
+//Product
+printProductTable(){
+  print("Product name - Product Price - Number of Prodcut");
+  products.forEach((element) {
+    print("${element.listIndex +1} - ${element.productName} - ${element.priceOfProduct} - ${element.numberOfProduct}");
+  });
+}
+
 List<Product> products =[];
 enum ProductType{Chips,Crakers,Cookies,SnackNuts,Chocolate,FruitSnacks,IceCream,Candy,PopCorn,Juice}
 
@@ -649,8 +968,13 @@ class Product{
 
 
   bool isThereEnoughProduct(int desiredAmount){
-    if(desiredAmount<= _numberOfProduct) return true;
-    else return false;
+    if(desiredAmount<= _numberOfProduct){
+      return true;
+    } 
+    else {
+      print("There isn't enough products");
+      return false;
+    }
   }
 
   void productReduction(int amountToBeReduce){
@@ -696,9 +1020,14 @@ class Chips implements Product{
   }
 
   @override
-  bool isThereEnoughProduct(int desiredAmount) {
-    if(desiredAmount<= _numberOfProduct) return true;
-    else return false;
+  bool isThereEnoughProduct(int desiredAmount){
+    if(desiredAmount<= _numberOfProduct){
+      return true;
+    } 
+    else {
+      print("There isn't enough products");
+      return false;
+    }
   }
 
   @override
@@ -734,9 +1063,14 @@ class Crakers implements Product{
   } 
 
   @override
-  bool isThereEnoughProduct(int desiredAmount) {
-    if(desiredAmount<= _numberOfProduct) return true;
-    else return false;
+  bool isThereEnoughProduct(int desiredAmount){
+    if(desiredAmount<= _numberOfProduct){
+      return true;
+    } 
+    else {
+      print("There isn't enough products");
+      return false;
+    }
   }
 
   @override
@@ -772,9 +1106,14 @@ class Cookies implements Product{
   } 
 
   @override
-  bool isThereEnoughProduct(int desiredAmount) {
-    if(desiredAmount<= _numberOfProduct) return true;
-    else return false;
+  bool isThereEnoughProduct(int desiredAmount){
+    if(desiredAmount<= _numberOfProduct){
+      return true;
+    } 
+    else {
+      print("There isn't enough products");
+      return false;
+    }
   }
 
   @override
@@ -810,9 +1149,14 @@ class SnackNuts implements Product{
   } 
 
   @override
-  bool isThereEnoughProduct(int desiredAmount) {
-    if(desiredAmount<= _numberOfProduct) return true;
-    else return false;
+  bool isThereEnoughProduct(int desiredAmount){
+    if(desiredAmount<= _numberOfProduct){
+      return true;
+    } 
+    else {
+      print("There isn't enough products");
+      return false;
+    }
   }
 
   @override
@@ -848,9 +1192,14 @@ class Chocolate implements Product{
   } 
 
   @override
-  bool isThereEnoughProduct(int desiredAmount) {
-    if(desiredAmount<= _numberOfProduct) return true;
-    else return false;
+  bool isThereEnoughProduct(int desiredAmount){
+    if(desiredAmount<= _numberOfProduct){
+      return true;
+    } 
+    else {
+      print("There isn't enough products");
+      return false;
+    }
   }
 
   @override
@@ -886,9 +1235,14 @@ class FruitSnacks implements Product{
   } 
 
   @override
-  bool isThereEnoughProduct(int desiredAmount) {
-    if(desiredAmount<= _numberOfProduct) return true;
-    else return false;
+  bool isThereEnoughProduct(int desiredAmount){
+    if(desiredAmount<= _numberOfProduct){
+      return true;
+    } 
+    else {
+      print("There isn't enough products");
+      return false;
+    }
   }
 
   @override
@@ -924,9 +1278,14 @@ class IceCream implements Product{
   } 
 
   @override
-  bool isThereEnoughProduct(int desiredAmount) {
-    if(desiredAmount<= _numberOfProduct) return true;
-    else return false;
+  bool isThereEnoughProduct(int desiredAmount){
+    if(desiredAmount<= _numberOfProduct){
+      return true;
+    } 
+    else {
+      print("There isn't enough products");
+      return false;
+    }
   }
 
   @override
@@ -962,9 +1321,14 @@ class Candy implements Product{
   } 
 
   @override
-  bool isThereEnoughProduct(int desiredAmount) {
-    if(desiredAmount<= _numberOfProduct) return true;
-    else return false;
+  bool isThereEnoughProduct(int desiredAmount){
+    if(desiredAmount<= _numberOfProduct){
+      return true;
+    } 
+    else {
+      print("There isn't enough products");
+      return false;
+    }
   }
 
   @override
@@ -1000,9 +1364,14 @@ class PopCorn implements Product{
   } 
 
   @override
-  bool isThereEnoughProduct(int desiredAmount) {
-    if(desiredAmount<= _numberOfProduct) return true;
-    else return false;
+  bool isThereEnoughProduct(int desiredAmount){
+    if(desiredAmount<= _numberOfProduct){
+      return true;
+    } 
+    else {
+      print("There isn't enough products");
+      return false;
+    }
   }
 
   @override
@@ -1038,9 +1407,14 @@ class Juice implements Product{
   } 
 
   @override
-  bool isThereEnoughProduct(int desiredAmount) {
-    if(desiredAmount<= _numberOfProduct) return true;
-    else return false;
+  bool isThereEnoughProduct(int desiredAmount){
+    if(desiredAmount<= _numberOfProduct){
+      return true;
+    } 
+    else {
+      print("There isn't enough products");
+      return false;
+    }
   }
 
   @override
@@ -1048,42 +1422,3 @@ class Juice implements Product{
     _numberOfProduct -= amountToBeReduce;
   } 
 }
-
-
-/*
-  int? takePin(){
-    print("Enter card pin");
-    int? pin = int.parse(stdin.readLineSync().toString());
-  }
-  
-  void wrongEntriescounter(){
-    _wrongEntries++;
-    print("${3-_wrongEntries} giriş hakkınız kaldı");
-    if(_wrongEntries>=3){
-      this._isCardBlocked = true;
-    }
-  }
-  
-  void _actiondefray(){
-    while(!_isCardBlocked){
-      int? pin = takePin();
-
-      if(pin == null){
-
-        print("Only number allowed");
-        wrongEntriescounter();
-
-      }else if(PasswordChecker(pin)){
-        
-      } 
-    }
-  }
-  
-  void defray(){
-    if(!_isCardBlocked){
-      _actiondefray();
-    }else{
-      print("You cannot perform this operation because your card is blocked");
-    }
-  }*/
-
