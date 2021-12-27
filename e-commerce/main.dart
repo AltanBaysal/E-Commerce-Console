@@ -1,42 +1,43 @@
 import 'dart:io';
 
-enum LoginState {selected,exit,unselected} 
+enum State {selected,exit,unselected} 
 
-enum UserType{customer,personel} 
-late UserType selectedUserType;
+enum PersonnelActions{PrintProductTable,ChangeNumberOfProduct,CustomerDebt}
 
-enum CardType{CreditCard,BankCard}
 
-enum PaymentMethods{CreditCard,BankCard,Cash,Debt} 
+//enum PaymentMethods{CreditCard,BankCard,Cash,Debt} //kullanımı yok
 
 void main(List<String> args) {
-  Interface.createAllObject();
+  Objectcreator.createAllObject();
   Interface.Start();
-  
 }
 
 
 //bu fonksiyonları statik mi yapmalıyım yoksa mainin içinde tanımlıyıp mı kullanmalıyım
 
 class Interface {
-  static Start(){
-    LoginState loginState = LoginState.unselected;
+  static late UserType selectedUserType;
+  static late PersonnelActions selectedPersonnelActions;
+  
 
-    while(loginState != LoginState.exit){  
+  static Start(){
+    State loginState = State.unselected;
+
+    while(loginState != State.exit){  
       Interface.printAction();
       loginState = Interface.getActions();
 
-      if(loginState == LoginState.selected) takeAction();
+      if(loginState == State.selected) takeAction();
 
       print("");
     }
   }
-
+  
   static printAction(){
     print("Select your Action");
     print("For customer press 1");
-    print("For personel press 2");
-    print("For exit tpye exit");
+    print("For personnel press 2");
+    print("For enter tpye exit");
   }
   
   static getActions(){
@@ -46,18 +47,18 @@ class Interface {
     switch(action!.toLowerCase()){
       case "1" :
       selectedUserType = UserType.customer;
-      return LoginState.selected;
+      return State.selected;
 
       case "2":
-      selectedUserType = UserType.personel;
-      return LoginState.selected;
+      selectedUserType = UserType.personnel;
+      return State.selected;
 
       case "exit":
-      return LoginState.exit;
+      return State.exit;
 
       default :{
         print("Enter valid action");
-        return LoginState.unselected;
+        return State.unselected;
       }
     }
 
@@ -67,22 +68,202 @@ class Interface {
   static takeAction(){
     switch(selectedUserType){
       case UserType.customer:
-      print("customer");
+      customerActions();
       break;
 
-      case UserType.personel:
-      print("personel");
+      case UserType.personnel:
+      personnelActionInteface();
       break;
     }
   }
 
 
-  static createAllObject(){
+//Custermer funcs
+  static customerActions(){
     
+  }
+
+
+//Personnel funcs
+  static personnelActionInteface(){
+    State personnelActionState = State.unselected;
+    bool isLoggin = personnelLogin();
+    while(isLoggin && personnelActionState != State.exit){
+
+      personnelPrintActions();
+      personnelActionState = personnelGetActions();
+
+      if(personnelActionState == State.selected) takePersonnelAction();
+
+
+    }
+  }
+  
+  static personnelPrintActions(){
+    print("Select your Action");
+    print("For print product table press 1");
+    print("For change number of product press 2");
+    print("For get customer debt press 3");
+    print("For exit enter exit");
+  }
+  
+  static personnelGetActions(){
+    
+    String? action = stdin.readLineSync();
+
+    switch (action!.toLowerCase()){
+      case "1":
+      selectedPersonnelActions = PersonnelActions.PrintProductTable;
+      return State.selected;
+
+      case "2":
+      selectedPersonnelActions = PersonnelActions.ChangeNumberOfProduct;
+      return State.selected;
+
+      case "3":
+      selectedPersonnelActions = PersonnelActions.CustomerDebt;
+      return State.selected;
+
+      case "exit":
+      return State.exit;
+
+      default :{
+        print("Enter valid action");
+        return State.unselected;
+      }
+      
+    }
+    
+
+  }
+
+  static takePersonnelAction(){
+    switch (selectedPersonnelActions){
+      case PersonnelActions.ChangeNumberOfProduct:
+      changeNumberOfProduct();
+      break;
+
+      case PersonnelActions.CustomerDebt:
+      getCustomerDebt();
+      break;
+
+      case PersonnelActions.PrintProductTable:
+      printProductTable();
+      break;
+    }
+  }
+
+
+  static bool personnelLogin(){
+    while(true){
+      print("for exit type exit");
+      print("Enter username");
+      String username = stdin.readLineSync() ?? "";
+
+      if(username.toLowerCase() == "exit") return false;
+
+      List<Personnel> personnel = personnels.where((element) => element._username == username).toList();
+      if(personnel.isEmpty){
+        print("Username not found. Try again");
+        continue;
+      }
+
+      print("for exit type exit");
+      print("Enter password");
+      String password = stdin.readLineSync() ?? "";
+      if(password.toLowerCase() == "exit") return false;
+
+      if(!personnel.first.passwordChecker(password)) continue;
+
+      return true;
+    }
+
+  }
+
+  
+
+  //bu iki fonksiyonu while a koy
+  static changeNumberOfProduct(){
+    while(true){
+      products.forEach((element) {
+        print("${element.listIndex +1} - ${element.productName}");
+      });
+
+      print("Enter product name");
+      String? productname = stdin.readLineSync();
+      if(productname == null){
+        print("Enter valid action");
+        continue;        
+      }
+
+      List<Product> selectedproduct = products.where((element) => element.productName == productname).toList();
+      if(selectedproduct.isEmpty){
+        print("Product not found");
+        continue;
+      }
+      
+      print("Enter new product number");
+      int ? numberOfProduct = int.tryParse(stdin.readLineSync().toString());
+      if(numberOfProduct == null){
+        print("just use numbers");
+        continue;
+      }
+
+      selectedproduct.first.setnumberOfProduct(numberOfProduct);
+      break;
+    }
+  }
+
+  static getCustomerDebt(){
+    while(true){
+      customers.forEach((element) {
+        print("${element.index +1} - ${element.username}");
+      });
+
+      print("Enter Customer name");
+      String? customername = stdin.readLineSync();
+
+      List<Customer> selectedcustomer = customers.where((element) => element._username == customername).toList();
+
+      if(selectedcustomer.isEmpty){
+        print("Customername not found\n");
+        continue;
+      }else{
+        print("${selectedcustomer.first.username} has a debt ${selectedcustomer.first.totalDebt}");
+        break;
+      }
+
+    }
+  }
+  
+  static printProductTable(){
+    print("Number - Product Name - Number Of Product - Price Of Product");
+
+    products.forEach((element) {
+      print("${element.listIndex+1} - ${element.productName} - ${element.numberOfProduct} - ${element.priceOfProduct}");
+    });
   }
 }
 
+
+
+
+
+
+
 class Objectcreator{
+  static createAllObject(){
+    customercreator("Customer1", 120);
+    Objectcreator.personnelcreator("Personnel1", "123456");
+
+    var i =0;
+    ProductType.values.forEach((type) {
+      i++;
+      String productname = type.toString().split('.').elementAt(1);
+      Objectcreator.productcreator(type, productname, i, i*10);
+    });
+  }
+  
   static productcreator(ProductType productType,String productName,int numberOfProduct,double priceOfProduct){
     int listIndex = products.length;
 
@@ -145,11 +326,22 @@ class Objectcreator{
     Customer newcustomer = Customer(cash, username,listIndex);
     customers.add(newcustomer);
   }
+
+  static personnelcreator(String username,String password){
+    int listIndex = personnels.length;
+    Personnel newpersonnel = Personnel(username, listIndex, password);
+    personnels.add(newpersonnel);
+  }
+
 }
 
 
 
+
+
+
 //User
+enum UserType{customer,personnel}
 
 class User{
   late String _username;
@@ -201,25 +393,61 @@ class Customer implements User{
   
 }
 
-
-List<Personel> personels = [];
-class Personel implements User{
+List<Personnel> personnels = [];
+class Personnel implements User{
   String _username;
-  UserType _usertype = UserType.personel;
+  UserType _usertype = UserType.personnel;
   int _index;
-  String password;
+  String _password;
 
+  bool _isAccessBlocked = false;
+  int _wrongEntries= 0;
+  
+  
   String get username => _username;
   UserType get usertype => _usertype;
   int get index => _index;
+  bool get isCardBlocked => _isAccessBlocked;
 
-  Personel(this._username,this._index,this.password);
+  Personnel(this._username,this._index,this._password);
+
+  bool passwordChecker(String password){
+    if(_isAccessBlocked){
+      print("your access blocked . You can't Login");
+      return false;
+    }
+    
+    if(this._password == password ){
+      wrongEntriesSetter(false);
+      return true;
+    }else {
+      print("Wrong password");
+      wrongEntriesSetter(true);
+      return false;
+    }
+  }
+  
+  void wrongEntriesSetter(bool isEntriesWrong) {
+    if(isEntriesWrong){
+      ++_wrongEntries;
+      print("remaining entry ${3 - _wrongEntries}");
+      if(_wrongEntries >= 3){
+        _isAccessBlocked = true;
+        print("Your access has blocked");
+      }
+    }
+    else{
+      _wrongEntries = 0;
+    }
+  }
 }
 
 
 
 
-//Cards +
+//Cards 
+enum CardType{CreditCard,BankCard}
+
 class Card {
   late int _cardNumber;  
   late int _pin;
@@ -243,8 +471,10 @@ class Card {
 
   bool PasswordChecker(int passowrd){
     if(_pin == passowrd){
+      wrongEntriesSetter(false);
       return true;
     }
+    wrongEntriesSetter(true);
     return false;
   }
   
@@ -257,15 +487,18 @@ class Card {
     }
   }
  
-  void wrongEntriesSetter(bool isEntriesWrong){
+  void wrongEntriesSetter(bool isEntriesWrong) {
     if(isEntriesWrong){
       ++_wrongEntries;
-      if(_wrongEntries >= 3) _isCardBlocked = true;
+      print("remaining entry ${3 - _wrongEntries}");
+      if(_wrongEntries >= 3){
+        _isCardBlocked = true;
+        print("Your access has blocked");
+      }
     }
     else{
       _wrongEntries = 0;
     }
-    
   }
 
 }
@@ -291,10 +524,16 @@ class CreditCard implements Card{
   CreditCard(this._cardNumber,this._pin,this._balance,this._index);  
 
   @override
-  bool PasswordChecker(int passowrd) {
+  bool PasswordChecker(int passowrd){
+    if(_isCardBlocked){
+      print("your access blocked . You can't Login");
+      return false;
+    }
     if(_pin == passowrd){
+      wrongEntriesSetter(false);
       return true;
     }
+    wrongEntriesSetter(true);
     return false;
   }
 
@@ -310,14 +549,20 @@ class CreditCard implements Card{
 
   @override
   void wrongEntriesSetter(bool isEntriesWrong) {
+    
     if(isEntriesWrong){
       ++_wrongEntries;
-      if(_wrongEntries >= 3) _isCardBlocked = true;
+      print("remaining entry ${3 - _wrongEntries}");
+      if(_wrongEntries >= 3){
+        _isCardBlocked = true;
+        print("Your access has blocked");
+      }
     }
     else{
       _wrongEntries = 0;
     }
   }
+
 }
 
 class BankCard implements Card{
@@ -343,9 +588,16 @@ class BankCard implements Card{
 
   @override
   bool PasswordChecker(int passowrd) {
+    if(_isCardBlocked){
+      print("your access blocked . You can't Login");
+      return false;
+    }
+
     if(_pin == passowrd){
+      wrongEntriesSetter(false);
       return true;
     }
+    wrongEntriesSetter(true);
     return false;
   }
 
@@ -374,8 +626,7 @@ class BankCard implements Card{
 
 
 
-
-//Product +
+//Product 
 List<Product> products =[];
 enum ProductType{Chips,Crakers,Cookies,SnackNuts,Chocolate,FruitSnacks,IceCream,Candy,PopCorn,Juice}
 
@@ -395,6 +646,7 @@ class Product{
   void setpriceOfProduct(double priceOfProduct){
     this._priceOfProduct = priceOfProduct;
   }
+
 
   bool isThereEnoughProduct(int desiredAmount){
     if(desiredAmount<= _numberOfProduct) return true;
