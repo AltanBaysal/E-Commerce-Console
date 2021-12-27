@@ -73,6 +73,7 @@ class Interface {
 }
 
 
+
 enum PaymentMethods{Card,Cash,Debt}
 Customeractions newCustomeractions = Customeractions();
 class Customeractions{
@@ -81,11 +82,13 @@ class Customeractions{
   late int indexofcustomer;
   
 
+
   actionInterface(){
     bool islogin = login();
+    
     while(islogin){
+      Funcs.printProductTable();
 
-      printProductTable();
       indexofproduct = getNumber();
       if(indexofproduct == -1) break;
       
@@ -113,7 +116,8 @@ class Customeractions{
       print("Username not found. Try again");
     }
   }
-  
+
+
 
   int getdesiredAmount(){
     while(true){
@@ -219,6 +223,8 @@ class Customeractions{
 }
 
 
+
+//+
 enum PersonnelActions{PrintProductTable,ChangeNumberOfProduct,CustomerDebt}
 Personnelactions newPersonnelactions = Personnelactions();
 class Personnelactions{
@@ -226,42 +232,58 @@ class Personnelactions{
 
   actionInterface(){
     State personnelActionState = State.unselected;
-    bool isLoggin = login();
+    bool isLoggin = login(); 
     while(isLoggin && personnelActionState != State.exit){
 
       printActions();
       personnelActionState = getAction();
-
       if(personnelActionState == State.selected) takeAction();
     }
   }
 
+  //login
   bool login(){
+    while(true){
+      
+      int personnelIndex = enterUsername();
+      if(personnelIndex == -1) return false;
+
+      return enterPassword(personnelIndex);
+
+    }
+  }
+
+  int enterUsername(){
     while(true){
       print("for exit type exit");
       print("Enter username");
+
       String username = stdin.readLineSync() ?? "";
 
-      if(username.toLowerCase() == "exit") return false;
+      if(username.toLowerCase() == "exit") return -1;
 
-      List<Personnel> personnel = personnels.where((element) => element._username == username).toList();
-      if(personnel.isEmpty){
-        print("Username not found. Try again");
-        continue;
+      List<Personnel> selectedpersonnel = personnels.where((element) => element._username == username).toList();
+
+      if(selectedpersonnel.isNotEmpty){
+        return selectedpersonnel.first._index;
       }
-
+      print("Username not found. Try again");
+    }
+  }
+  
+  bool enterPassword(int personnelIndex){
+    while(true){
       print("for exit type exit");
       print("Enter password");
       String password = stdin.readLineSync() ?? "";
+
       if(password.toLowerCase() == "exit") return false;
 
-      if(!personnel.first.passwordChecker(password)) continue;
-
-      return true;
+      if(personnels[personnelIndex].passwordChecker(password)) return true;
     }
-
   }
-  
+
+
   printActions(){
     print("Select your Action");
     print("For print product table press 1");
@@ -270,7 +292,7 @@ class Personnelactions{
     print("For exit enter exit");
   }
   
-  getAction(){
+  State getAction(){
     
     String? action = stdin.readLineSync();
 
@@ -311,71 +333,141 @@ class Personnelactions{
       break;
 
       case PersonnelActions.PrintProductTable:
-      printProductTable();
+      Funcs.printProductTable();
       break;
     }
   }
 
 
-  //func
+  //changenumber
   changeNumberOfProduct(){
     while(true){
-      products.forEach((element) {
-        print("${element.listIndex +1} - ${element.productName}");
-      });
-
-      print("Enter product name");
-      String? productname = stdin.readLineSync();
-      if(productname == null){
-        print("Enter valid action");
-        continue;        
-      }
-
-      List<Product> selectedproduct = products.where((element) => element.productName == productname).toList();
-      if(selectedproduct.isEmpty){
-        print("Product not found");
-        continue;
-      }
       
-      print("Enter new product number");
-      int ? numberOfProduct = int.tryParse(stdin.readLineSync().toString());
-      if(numberOfProduct == null){
-        print("Only numbers allowed");
-        continue;
-      }
+      int productIndex = chooseProduct();
+      if(productIndex == -2) break;
+      if(productIndex < 0) continue;
+      
 
-      selectedproduct.first.setnumberOfProduct(numberOfProduct);
-      break;
-    }
-  }
-
-  getCustomerDebt(){
-    while(true){
-      customers.forEach((element) {
-        print("${element.index +1} - ${element.username}");
-      });
-
-      print("Enter Customer name");
-      String? customername = stdin.readLineSync();
-
-      List<Customer> selectedcustomer = customers.where((element) => element._username == customername).toList();
-
-      if(selectedcustomer.isEmpty){
-        print("Customername not found\n");
-        continue;
-      }else{
-        print("${selectedcustomer.first.username} has a debt ${selectedcustomer.first.totalDebt}");
+      if(setNumberOfProduct(productIndex)){
         break;
       }
-
     }
   }
+
+  int chooseProduct(){
+    Funcs.printProductTable();
+    print("For exit type exit");
+    print("Enter product name");
+    String? productname = stdin.readLineSync();
+
+    if(productname == null){
+      print("Enter valid action");
+      return -1;
+    }
+    else{
+      List<Product> selectedproduct = products.where((element) => element.productName == productname).toList();
+      if(selectedproduct.isNotEmpty){
+        return selectedproduct.first._listIndex;
+      }
+
+      else{
+        print("Product not found");
+      return -1;
+      }
+    }
+
+  }
   
+  bool setNumberOfProduct(int productIndex){
+    while(true){
+      print("For exit type exit");
+      print("Enter new product number");
+      String action = stdin.readLineSync().toString();
+      if(action.toLowerCase() == "exit") return true;
+
+      int ? numberOfProduct = int.tryParse(action);
+      if(numberOfProduct != null && numberOfProduct >= 0){
+        products[productIndex].setnumberOfProduct(numberOfProduct);
+        print("transaction completed successfully");
+        return true;
+      }
+
+      else if(numberOfProduct == null){
+        print("Only numbers allowed");
+      }
+
+      else{
+        print("The number of products cannot be less than 0");
+      }
+    }
+  }
+
+
+  //getdebtinfo
+  getCustomerDebt(){
+    while(true){
+      Funcs.printCustomerList();
   
+       
+      int customerIndex = choseCustomer();
+      if(customerIndex == -2) break;
+      if(customerIndex < 0) continue;
+
+     
+      print("${customers[customerIndex].username} has a debt ${customers[customerIndex].totalDebt}");
+      
+    }
+  }
+
+  int choseCustomer(){
+    print("For exit type exit");
+    print("Enter Customer name");
+    String? customername = stdin.readLineSync();
+
+    if(customername == null){
+      print("");
+      return -1;
+    }
+
+    if(customername.toLowerCase() == "exit"){
+      return -2;
+    }
+
+    List<Customer> selectedcustomer = customers.where((element) => element._username == customername).toList();
+
+    if(selectedcustomer.isNotEmpty){
+      return selectedcustomer.first._index;
+    }
+    
+    print("Customername not found\n");
+    return -1;
+    
+  }
 }
 
 
 
+class Funcs{
+  static printProductTable(){
+    print("Product name - Product Price - Number of Prodcut");
+    products.forEach((element) {
+    print("${element.listIndex +1} - ${element.productName} - ${element.priceOfProduct} - ${element.numberOfProduct}");
+  });
+
+
+}
+  
+  static printCustomerList(){
+    customers.forEach((element) {
+        print("${element.index +1} - ${element.username}");
+    });
+  }
+}
+
+
+
+
+//+
 Objectcreator newObjectcreator = Objectcreator();
 class Objectcreator{
   createAllObject(){
@@ -471,7 +563,6 @@ class Objectcreator{
 }
 
 
-
 //User 
 enum UserType{customer,personnel}
 
@@ -488,7 +579,6 @@ class User{
 
 List<Customer> customers =[];
 class Customer implements User{
-  
   String _username;
   UserType _usertype = UserType.customer;
   int _index;
@@ -524,6 +614,7 @@ class Customer implements User{
     }
   }
   
+
   int selectCard(){
     while(true){
       cards.forEach((element) {
@@ -545,9 +636,9 @@ class Customer implements User{
       }else{
         print("Enter valid action");
       }
-
     }
   }
+
 
   bool payByCash(double bill){
     if(bill<=_cash){
@@ -590,6 +681,7 @@ class Customer implements User{
         isThereEnoughMoneyCard = true;
       }
     });
+
     if(isThereEnoughMoneyCard){
       print("You have enough money in your card to pay");
       return true;
@@ -650,7 +742,7 @@ class Personnel implements User{
 
 
 
-//Cards 
+//Cards
 
 enum CardType{CreditCard,BankCard}
 
@@ -684,7 +776,6 @@ class Card {
       if(actions == null){
         print("Enter valid action");
       }
-      
       else if(actions.toLowerCase() == "exit"){
         return false;
       }
@@ -937,12 +1028,6 @@ class BankCard implements Card{
 
 
 //Product
-printProductTable(){
-  print("Product name - Product Price - Number of Prodcut");
-  products.forEach((element) {
-    print("${element.listIndex +1} - ${element.productName} - ${element.priceOfProduct} - ${element.numberOfProduct}");
-  });
-}
 
 List<Product> products =[];
 enum ProductType{Chips,Crakers,Cookies,SnackNuts,Chocolate,FruitSnacks,IceCream,Candy,PopCorn,Juice}
