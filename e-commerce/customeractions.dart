@@ -4,26 +4,60 @@ import 'product.dart';
 import 'user.dart';
 
 enum PaymentMethods{Card,Cash,Debt}
-Customeractions newCustomeractions = Customeractions();
-class Customeractions{
-  late int indexofproduct; 
+
+extension PaymentExtention on PaymentMethods{
+  bool buyProduct(double bill,int indexOfCustomer,int desiredAmount,int indexOfProduct){
+
+    switch (this){
+      case PaymentMethods.Card :{
+        if(customers[indexOfCustomer].payByCard(bill)){
+          products[indexOfProduct].productReduction(desiredAmount);
+          return true;
+        }
+        return false;
+      }
+        
+      case PaymentMethods.Cash:{
+        if(customers[indexOfCustomer].payByCash(bill)){
+          products[indexOfProduct].productReduction(desiredAmount);
+          return true;
+        }
+        return false;
+      }
+        
+      case PaymentMethods.Debt:{
+        if(customers[indexOfCustomer].payByDebt(bill)){
+          products[indexOfProduct].productReduction(desiredAmount);
+          return true;
+        }
+        return false;
+      }
+    }
+  }
+}
+
+
+CustomerActions newCustomerActions = CustomerActions();
+
+class CustomerActions{
+  late int indexOfProduct; 
   late int desiredAmount;
-  late int indexofcustomer;
+  late int indexOfCustomer;
   
 
   actionInterface(){
-    bool islogin = login();
+    bool isLogin = login();
     
-    while(islogin){
+    while(isLogin){
       Funcs.printProductTable();
 
-      indexofproduct = getNumber();
-      if(indexofproduct == -1) break;
+      indexOfProduct = getNumber();
+      if(indexOfProduct == -1) break;
       
       while(true){
-        desiredAmount = getdesiredAmount();
-      
-        if(products[indexofproduct].isThereEnoughProduct(desiredAmount)) {
+        desiredAmount = getDesiredAmount();
+
+        if(products[indexOfProduct].isThereEnoughProduct(desiredAmount)) {
           selectPaymentMethods();
           break;
         }
@@ -39,26 +73,30 @@ class Customeractions{
 
       if(username.toLowerCase() == "exit") return false;
 
-      var personnel = customers.where((element) => element.username == username).toList();
-      if(personnel.isNotEmpty){
-        indexofcustomer =  personnel.first.index;
-        return true;
+      //username bulunmadığında badstate hatası veriyor null döndüremiyorum çözemedim :(
+      indexOfCustomer = -1;
+      for(var i =0;i<customers.length;i++){
+        if(customers[i].username == username){
+          indexOfCustomer = i;
+          return true;
+        }
       }
-      print("Username not found. Try again");
+
+      print("username not found. Try again");
     }
   }
 
 
-  int getdesiredAmount(){
+  int getDesiredAmount(){
     while(true){
       print("Enter how many items you want to buy");  
-      int? desiredamount = int.tryParse(stdin.readLineSync().toString());
+      int? desiredAmount = int.tryParse(stdin.readLineSync().toString());
     
-      if(desiredamount == null){
+      if(desiredAmount == null){
         print("Only numbers allowed");
       }
-      else if(desiredamount > 0){
-        return desiredamount;
+      else if(desiredAmount > 0){
+        return desiredAmount;
       }
     }
   }
@@ -86,7 +124,7 @@ class Customeractions{
 
 
   selectPaymentMethods(){
-    double priceOfProduct = products[indexofproduct].priceOfProduct;;
+    double priceOfProduct = products[indexOfProduct].priceOfProduct;;
     double bill = desiredAmount*priceOfProduct;
 
     while(true){
@@ -94,7 +132,7 @@ class Customeractions{
       print("Amount to be paid $bill");
       print("Select a payment methods");
       print("for card press 1");
-      print("for cash press 2  You have ${customers[indexofcustomer].cash} cash");
+      print("for cash press 2  You have ${customers[indexOfCustomer].cash} cash");
       print("for debt press 3");
 
       int action = int.tryParse(stdin.readLineSync().toString()) ?? -1;
@@ -120,39 +158,13 @@ class Customeractions{
       if(selectedPaymentMethods != null){
         if(buyProduct(selectedPaymentMethods,bill)) break;
       }
-
     }
   }
 
-  bool buyProduct(PaymentMethods selectedPaymentMethods,double bill){
-    switch (selectedPaymentMethods){
-      case PaymentMethods.Card :{
-        if(customers[indexofcustomer].payByCard(bill)){
-          products[indexofproduct].productReduction(desiredAmount);
-          return true;
-        }
-        return false;
-      }
-        
-      case PaymentMethods.Cash:{
-        if(customers[indexofcustomer].payByCash(bill)){
-          products[indexofproduct].productReduction(desiredAmount);
-          return true;
-        }
-        return false;
-      }
-        
-      case PaymentMethods.Debt:{
-        if(customers[indexofcustomer].payByDebt(bill)){
-          products[indexofproduct].productReduction(desiredAmount);
-          return true;
-        }
-        return false;
-      }
-    }
+
+  bool buyProduct(PaymentMethods selectedPaymentMethod,double bill){
+    return selectedPaymentMethod.buyProduct(bill, indexOfCustomer, desiredAmount, indexOfProduct);
   }
 
 }
 
-
-//fazla product number söyleyince tekrar product number sorsun

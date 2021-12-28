@@ -4,11 +4,33 @@ import 'main.dart';
 import 'product.dart';
 import 'user.dart';
 
-enum PersonnelActions{PrintProductTable,ChangeNumberOfProduct,CustomerDebt}
-Personnelactions newPersonnelactions = Personnelactions();
-class Personnelactions{
-  late PersonnelActions selectedPersonnelActions;
+enum SelectedPersonnelActions{PrintProductTable,ChangeNumberOfProduct,CustomerDebt}//+
 
+
+extension PersonnelActionsExtension on SelectedPersonnelActions{
+  takeAction(){
+    switch (this){
+      case SelectedPersonnelActions.ChangeNumberOfProduct:
+      newPersonnelActions.changeNumberOfProduct();
+      break;
+
+      case SelectedPersonnelActions.CustomerDebt:
+      newPersonnelActions.getCustomerDebt();
+      break;
+
+      case SelectedPersonnelActions.PrintProductTable:
+      Funcs.printProductTable();
+      break;
+    }
+  }
+}
+
+
+PersonnelActions newPersonnelActions = PersonnelActions();
+
+class PersonnelActions{
+  late SelectedPersonnelActions selectedPersonnelActions;
+  
   actionInterface(){
     State personnelActionState = State.unselected;
     bool isLoggin = login(); 
@@ -16,7 +38,7 @@ class Personnelactions{
 
       printActions();
       personnelActionState = getAction();
-      if(personnelActionState == State.selected) takeAction();
+      if(personnelActionState == State.selected) selectedPersonnelActions.takeAction();
     }
   }
 
@@ -24,7 +46,7 @@ class Personnelactions{
   bool login(){
     while(true){
       
-      int personnelIndex = enterUsername();
+      int personnelIndex = enterusername();
       if(personnelIndex == -1) return false;
 
       return enterPassword(personnelIndex);
@@ -32,21 +54,26 @@ class Personnelactions{
     }
   }
 
-  int enterUsername(){
+  int enterusername(){
     while(true){
       print("for exit type exit");
+      
       print("Enter username");
+      personnels.forEach((element) {
+        print(element.username);
+      });
+    
 
       String username = stdin.readLineSync() ?? "";
-
       if(username.toLowerCase() == "exit") return -1;
-
-      List<Personnel> selectedpersonnel = personnels.where((element) => element.username == username).toList();
-
-      if(selectedpersonnel.isNotEmpty){
-        return selectedpersonnel.first.index;
+      
+      for(var i  =0;i<personnels.length;i++){
+        if(personnels[i].username == username){
+          return  i;
+        }
       }
-      print("Username not found. Try again");
+
+      print("username not found. Try again");
     }
   }
   
@@ -77,15 +104,15 @@ class Personnelactions{
 
     switch (action!.toLowerCase()){
       case "1":
-      selectedPersonnelActions = PersonnelActions.PrintProductTable;
+      selectedPersonnelActions = SelectedPersonnelActions.PrintProductTable;
       return State.selected;
 
       case "2":
-      selectedPersonnelActions = PersonnelActions.ChangeNumberOfProduct;
+      selectedPersonnelActions = SelectedPersonnelActions.ChangeNumberOfProduct;
       return State.selected;
 
       case "3":
-      selectedPersonnelActions = PersonnelActions.CustomerDebt;
+      selectedPersonnelActions = SelectedPersonnelActions.CustomerDebt;
       return State.selected;
 
       case "exit":
@@ -101,21 +128,7 @@ class Personnelactions{
 
   }
 
-  takeAction(){
-    switch (selectedPersonnelActions){
-      case PersonnelActions.ChangeNumberOfProduct:
-      changeNumberOfProduct();
-      break;
 
-      case PersonnelActions.CustomerDebt:
-      getCustomerDebt();
-      break;
-
-      case PersonnelActions.PrintProductTable:
-      Funcs.printProductTable();
-      break;
-    }
-  }
 
 
   //changenumber
@@ -123,13 +136,12 @@ class Personnelactions{
     while(true){
       
       int productIndex = chooseProduct();
-      if(productIndex == -2) break;
+      if(productIndex == -1) break;
       if(productIndex < 0) continue;
       
 
-      if(setNumberOfProduct(productIndex)){
-        break;
-      }
+      if(setNumberOfProduct(productIndex)) break;
+
     }
   }
 
@@ -137,23 +149,16 @@ class Personnelactions{
     Funcs.printProductTable();
     print("For exit type exit");
     print("Enter product name");
-    String? productname = stdin.readLineSync();
+    String productname = stdin.readLineSync().toString();
+    if(productname.toLowerCase() == "exit") return -1;
 
-    if(productname == null){
-      print("Enter valid action");
-      return -1;
-    }
-    else{
-      List<Product> selectedproduct = products.where((element) => element.productName == productname).toList();
-      if(selectedproduct.isNotEmpty){
-        return selectedproduct.first.listIndex;
-      }
-
-      else{
-        print("Product not found");
-      return -1;
+    for(var i =0;i<products.length;i++){
+      if(products[i].productName == productname){
+        return  i;
       }
     }
+    print("Product not found");   
+    return -2;
 
   }
   
@@ -161,10 +166,12 @@ class Personnelactions{
     while(true){
       print("For exit type exit");
       print("Enter new product number");
+
       String action = stdin.readLineSync().toString();
       if(action.toLowerCase() == "exit") return true;
 
       int ? numberOfProduct = int.tryParse(action);
+      
       if(numberOfProduct != null && numberOfProduct >= 0){
         products[productIndex].setnumberOfProduct(numberOfProduct);
         print("transaction completed successfully");
@@ -187,39 +194,31 @@ class Personnelactions{
     while(true){
       Funcs.printCustomerList();
   
-       
       int customerIndex = choseCustomer();
-      if(customerIndex == -2) break;
-      if(customerIndex < 0) continue;
+      if(customerIndex == -1) break;
+      if(customerIndex <0) continue;
 
-     
       print("${customers[customerIndex].username} has a debt ${customers[customerIndex].totalDebt}");
-      
     }
   }
 
   int choseCustomer(){
     print("For exit type exit");
     print("Enter Customer name");
-    String? customername = stdin.readLineSync();
+    String? customername = stdin.readLineSync().toString();
 
-    if(customername == null){
-      print("");
+    if(customername.toLowerCase() == "exit"){
       return -1;
     }
 
-    if(customername.toLowerCase() == "exit"){
-      return -2;
-    }
-
-    List<Customer> selectedcustomer = customers.where((element) => element.username == customername).toList();
-
-    if(selectedcustomer.isNotEmpty){
-      return selectedcustomer.first.index;
+    for(var i =0;i<customers.length;i++){
+      if(customers[i].username == customername){
+        return  i;
+      }
     }
     
-    print("Customername not found\n");
-    return -1;
+    print("Customername not found");
+    return -2;
     
   }
 }

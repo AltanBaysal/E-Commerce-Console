@@ -1,12 +1,51 @@
 List<Product> products =[];
 enum ProductType{Chips,Crakers,Cookies,SnackNuts,Chocolate,FruitSnacks,IceCream,Candy,PopCorn,Juice}
 
-class Product{
-  late String _productName;
-  late int _listIndex; 
+extension ProductExtension on ProductType{
+  Product ProductCreator(String productName,int numberOfProduct,double priceOfProduct){
+    switch(this){
+      case ProductType.Candy:{
+        return Candy(productName, numberOfProduct, priceOfProduct);
+      }
+      case ProductType.Chips:{
+        return Chips(productName, numberOfProduct, priceOfProduct);
+      }
+      case ProductType.Chocolate:{
+        return Chocolate(productName, numberOfProduct, priceOfProduct);
+      }
+      case ProductType.Cookies:{
+        return Cookies(productName, numberOfProduct, priceOfProduct);
+      }
+      case ProductType.Crakers:{
+        return Crakers(productName, numberOfProduct, priceOfProduct);
+      }
+      case ProductType.FruitSnacks:{
+        return FruitSnacks(productName, numberOfProduct, priceOfProduct);
+      }
+      case ProductType.IceCream:{
+        return IceCream(productName, numberOfProduct, priceOfProduct);
+      }
+      case ProductType.Juice:{
+        return Juice(productName, numberOfProduct, priceOfProduct);
+      }
+      case ProductType.PopCorn:{
+        return PopCorn(productName, numberOfProduct, priceOfProduct);
+      }
+      case ProductType.SnackNuts:{
+        return SnackNuts(productName, numberOfProduct, priceOfProduct);
+      }
+    }
+  }
+}
 
-  late int _numberOfProduct;
-  late double _priceOfProduct;
+
+class Product{
+  String _productName;
+
+  int _numberOfProduct;
+  double _priceOfProduct;
+
+  Product(this._productName,this._numberOfProduct,this._priceOfProduct);
 
 
   //setter
@@ -38,439 +77,45 @@ class Product{
   String get productName => _productName;
   int get numberOfProduct => _numberOfProduct;
   double get priceOfProduct => _priceOfProduct;
-  int get listIndex => _listIndex; 
 }
 
 
-class Chips implements Product{
-  ProductType productType = ProductType.Chips;
-  String _productName;
-  int _listIndex; 
-
-  int _numberOfProduct;
-  double _priceOfProduct;
-
-  Chips(this._productName, this._listIndex,this._numberOfProduct,this._priceOfProduct);
-
-  
-
-  //getters
-  String get productName => _productName;
-  int get numberOfProduct => _numberOfProduct;
-  double get priceOfProduct => _priceOfProduct;
-  int get listIndex => _listIndex;
-
-
-  @override
-  void setnumberOfProduct(int numberOfProduct) {
-    this._numberOfProduct = numberOfProduct;
-  }
-
-  @override
-  void setpriceOfProduct(double priceOfProduct) {
-    this._priceOfProduct = priceOfProduct;
-  }
-
-  @override
-  bool isThereEnoughProduct(int desiredAmount){
-    if(desiredAmount<= _numberOfProduct){
-      return true;
-    } 
-    else {
-      print("There isn't enough products");
-      return false;
-    }
-  }
-
-  @override
-  void productReduction(int amountToBeReduce) {
-    _numberOfProduct -= amountToBeReduce;
-  } 
+class Chips extends Product{
+  Chips(String _productName,int _numberOfProduct,double _priceOfProduct):super(_productName,_numberOfProduct,_priceOfProduct);
 }
 
-class Crakers implements Product{
-  ProductType productType = ProductType.Crakers;
-  int _listIndex;
-  int _numberOfProduct;
-  double _priceOfProduct;
-  String _productName;
-
-
-  Crakers(this._productName, this._listIndex,this._numberOfProduct,this._priceOfProduct);
-
-
-  String get productName => _productName;
-  int get numberOfProduct => _numberOfProduct;
-  double get priceOfProduct => _priceOfProduct;
-  int get listIndex => _listIndex; 
-
-  @override
-  void setnumberOfProduct(int numberOfProduct) {
-    this._numberOfProduct = numberOfProduct;
-  }
-
-  @override
-  void setpriceOfProduct(double priceOfProduct) {
-    this._priceOfProduct = priceOfProduct;
-  } 
-
-  @override
-  bool isThereEnoughProduct(int desiredAmount){
-    if(desiredAmount<= _numberOfProduct){
-      return true;
-    } 
-    else {
-      print("There isn't enough products");
-      return false;
-    }
-  }
-
-  @override
-  void productReduction(int amountToBeReduce) {
-    _numberOfProduct -= amountToBeReduce;
-  } 
+class Crakers extends Product{
+  Crakers(String _productName,int _numberOfProduct,double _priceOfProduct):super(_productName,_numberOfProduct,_priceOfProduct);
 }
 
-class Cookies implements Product{
-  ProductType productType = ProductType.Cookies;
-  int _listIndex;
-  int _numberOfProduct;
-  double _priceOfProduct;
-  String _productName;
-
-
-  Cookies(this._productName, this._listIndex,this._numberOfProduct,this._priceOfProduct);
-
-
-  String get productName => _productName;
-  int get numberOfProduct => _numberOfProduct;
-  double get priceOfProduct => _priceOfProduct;
-  int get listIndex => _listIndex; 
-
-  @override
-  void setnumberOfProduct(int numberOfProduct) {
-    this._numberOfProduct = numberOfProduct;
-  }
-
-  @override
-  void setpriceOfProduct(double priceOfProduct) {
-    this._priceOfProduct = priceOfProduct;
-  } 
-
-  @override
-  bool isThereEnoughProduct(int desiredAmount){
-    if(desiredAmount<= _numberOfProduct){
-      return true;
-    } 
-    else {
-      print("There isn't enough products");
-      return false;
-    }
-  }
-
-  @override
-  void productReduction(int amountToBeReduce) {
-    _numberOfProduct -= amountToBeReduce;
-  } 
+class Cookies extends Product{
+  Cookies(String _productName,int _numberOfProduct,double _priceOfProduct):super(_productName,_numberOfProduct,_priceOfProduct);
 }
 
-class SnackNuts implements Product{
-  ProductType productType = ProductType.SnackNuts;
-  int _listIndex;
-  int _numberOfProduct;
-  double _priceOfProduct;
-  String _productName;
-
-
-  SnackNuts(this._productName, this._listIndex,this._numberOfProduct,this._priceOfProduct);
-
-
-  String get productName => _productName;
-  int get numberOfProduct => _numberOfProduct;
-  double get priceOfProduct => _priceOfProduct;
-  int get listIndex => _listIndex; 
-
-  @override
-  void setnumberOfProduct(int numberOfProduct) {
-    this._numberOfProduct = numberOfProduct;
-  }
-
-  @override
-  void setpriceOfProduct(double priceOfProduct) {
-    this._priceOfProduct = priceOfProduct;
-  } 
-
-  @override
-  bool isThereEnoughProduct(int desiredAmount){
-    if(desiredAmount<= _numberOfProduct){
-      return true;
-    } 
-    else {
-      print("There isn't enough products");
-      return false;
-    }
-  }
-
-  @override
-  void productReduction(int amountToBeReduce) {
-    _numberOfProduct -= amountToBeReduce;
-  } 
+class SnackNuts extends Product{
+  SnackNuts(String _productName,int _numberOfProduct,double _priceOfProduct):super(_productName,_numberOfProduct,_priceOfProduct);
 }
 
-class Chocolate implements Product{
-  ProductType productType = ProductType.Chocolate;
-  int _listIndex;
-  int _numberOfProduct;
-  double _priceOfProduct;
-  String _productName;
-
-
-  Chocolate(this._productName, this._listIndex,this._numberOfProduct,this._priceOfProduct);
-
-
-  String get productName => _productName;
-  int get numberOfProduct => _numberOfProduct;
-  double get priceOfProduct => _priceOfProduct;
-  int get listIndex => _listIndex; 
-
-  @override
-  void setnumberOfProduct(int numberOfProduct) {
-    this._numberOfProduct = numberOfProduct;
-  }
-
-  @override
-  void setpriceOfProduct(double priceOfProduct) {
-    this._priceOfProduct = priceOfProduct;
-  } 
-
-  @override
-  bool isThereEnoughProduct(int desiredAmount){
-    if(desiredAmount<= _numberOfProduct){
-      return true;
-    } 
-    else {
-      print("There isn't enough products");
-      return false;
-    }
-  }
-
-  @override
-  void productReduction(int amountToBeReduce) {
-    _numberOfProduct -= amountToBeReduce;
-  } 
+class Chocolate extends Product{
+  Chocolate(String _productName,int _numberOfProduct,double _priceOfProduct):super(_productName,_numberOfProduct,_priceOfProduct);
 }
 
-class FruitSnacks implements Product{
-  ProductType productType = ProductType.FruitSnacks;
-  int _listIndex;
-  int _numberOfProduct;
-  double _priceOfProduct;
-  String _productName;
-
-
-  FruitSnacks(this._productName, this._listIndex,this._numberOfProduct,this._priceOfProduct);
-
-
-  String get productName => _productName;
-  int get numberOfProduct => _numberOfProduct;
-  double get priceOfProduct => _priceOfProduct;
-  int get listIndex => _listIndex; 
-
-  @override
-  void setnumberOfProduct(int numberOfProduct) {
-    this._numberOfProduct = numberOfProduct;
-  }
-
-  @override
-  void setpriceOfProduct(double priceOfProduct) {
-    this._priceOfProduct = priceOfProduct;
-  } 
-
-  @override
-  bool isThereEnoughProduct(int desiredAmount){
-    if(desiredAmount<= _numberOfProduct){
-      return true;
-    } 
-    else {
-      print("There isn't enough products");
-      return false;
-    }
-  }
-
-  @override
-  void productReduction(int amountToBeReduce) {
-    _numberOfProduct -= amountToBeReduce;
-  } 
+class FruitSnacks extends Product{
+  FruitSnacks(String _productName,int _numberOfProduct,double _priceOfProduct):super(_productName,_numberOfProduct,_priceOfProduct);
 }
 
-class IceCream implements Product{
-  ProductType productType = ProductType.IceCream;
-  int _listIndex;
-  int _numberOfProduct;
-  double _priceOfProduct;
-  String _productName;
-
-
-  IceCream(this._productName, this._listIndex,this._numberOfProduct,this._priceOfProduct);
-
-
-  String get productName => _productName;
-  int get numberOfProduct => _numberOfProduct;
-  double get priceOfProduct => _priceOfProduct;
-  int get listIndex => _listIndex; 
-
-  @override
-  void setnumberOfProduct(int numberOfProduct) {
-    this._numberOfProduct = numberOfProduct;
-  }
-
-  @override
-  void setpriceOfProduct(double priceOfProduct) {
-    this._priceOfProduct = priceOfProduct;
-  } 
-
-  @override
-  bool isThereEnoughProduct(int desiredAmount){
-    if(desiredAmount<= _numberOfProduct){
-      return true;
-    } 
-    else {
-      print("There isn't enough products");
-      return false;
-    }
-  }
-
-  @override
-  void productReduction(int amountToBeReduce) {
-    _numberOfProduct -= amountToBeReduce;
-  } 
+class IceCream extends Product{
+  IceCream(String _productName,int _numberOfProduct,double _priceOfProduct):super(_productName,_numberOfProduct,_priceOfProduct);
 }
 
-class Candy implements Product{
-  ProductType productType = ProductType.Candy;
-  int _listIndex;
-  int _numberOfProduct;
-  double _priceOfProduct;
-  String _productName;
-
-
-  Candy(this._productName, this._listIndex,this._numberOfProduct,this._priceOfProduct);
-
-
-  String get productName => _productName;
-  int get numberOfProduct => _numberOfProduct;
-  double get priceOfProduct => _priceOfProduct;
-  int get listIndex => _listIndex; 
-
-  @override
-  void setnumberOfProduct(int numberOfProduct) {
-    this._numberOfProduct = numberOfProduct;
-  }
-
-  @override
-  void setpriceOfProduct(double priceOfProduct) {
-    this._priceOfProduct = priceOfProduct;
-  } 
-
-  @override
-  bool isThereEnoughProduct(int desiredAmount){
-    if(desiredAmount<= _numberOfProduct){
-      return true;
-    } 
-    else {
-      print("There isn't enough products");
-      return false;
-    }
-  }
-
-  @override
-  void productReduction(int amountToBeReduce) {
-    _numberOfProduct -= amountToBeReduce;
-  } 
+class Candy extends Product{
+  Candy(String _productName,int _numberOfProduct,double _priceOfProduct):super(_productName,_numberOfProduct,_priceOfProduct);
 }
 
-class PopCorn implements Product{
-  ProductType productType = ProductType.PopCorn;
-  int _listIndex;
-  int _numberOfProduct;
-  double _priceOfProduct;
-  String _productName;
-
-
-  PopCorn(this._productName, this._listIndex,this._numberOfProduct,this._priceOfProduct);
-
-
-  String get productName => _productName;
-  int get numberOfProduct => _numberOfProduct;
-  double get priceOfProduct => _priceOfProduct;
-  int get listIndex => _listIndex; 
-
-  @override
-  void setnumberOfProduct(int numberOfProduct) {
-    this._numberOfProduct = numberOfProduct;
-  }
-
-  @override
-  void setpriceOfProduct(double priceOfProduct) {
-    this._priceOfProduct = priceOfProduct;
-  } 
-
-  @override
-  bool isThereEnoughProduct(int desiredAmount){
-    if(desiredAmount<= _numberOfProduct){
-      return true;
-    } 
-    else {
-      print("There isn't enough products");
-      return false;
-    }
-  }
-
-  @override
-  void productReduction(int amountToBeReduce) {
-    _numberOfProduct -= amountToBeReduce;
-  } 
+class PopCorn extends Product{
+  PopCorn(String _productName,int _numberOfProduct,double _priceOfProduct):super(_productName,_numberOfProduct,_priceOfProduct);
 }
 
-class Juice implements Product{
-  ProductType productType = ProductType.Juice;
-  int _listIndex;
-  int _numberOfProduct;
-  double _priceOfProduct;
-  String _productName;
-
-
-  Juice(this._productName, this._listIndex,this._numberOfProduct,this._priceOfProduct);
-
-
-  String get productName => _productName;
-  int get numberOfProduct => _numberOfProduct;
-  double get priceOfProduct => _priceOfProduct;
-  int get listIndex => _listIndex; 
-
-  @override
-  void setnumberOfProduct(int numberOfProduct) {
-    this._numberOfProduct = numberOfProduct;
-  }
-
-  @override
-  void setpriceOfProduct(double priceOfProduct) {
-    this._priceOfProduct = priceOfProduct;
-  } 
-
-  @override
-  bool isThereEnoughProduct(int desiredAmount){
-    if(desiredAmount<= _numberOfProduct){
-      return true;
-    } 
-    else {
-      print("There isn't enough products");
-      return false;
-    }
-  }
-
-  @override
-  void productReduction(int amountToBeReduce) {
-    _numberOfProduct -= amountToBeReduce;
-  } 
+class Juice extends Product{
+  Juice(String _productName,int _numberOfProduct,double _priceOfProduct):super(_productName,_numberOfProduct,_priceOfProduct);
 }

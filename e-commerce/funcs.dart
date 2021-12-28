@@ -4,16 +4,20 @@ import 'user.dart';
 class Funcs{
   static printProductTable(){
     print("Product name - Product Price - Number of Prodcut");
+    var i = 0;
     products.forEach((element) {
-    print("${element.listIndex +1} - ${element.productName} - ${element.priceOfProduct} - ${element.numberOfProduct}");
-  });
+      i++;
+      print("${i} - ${element.productName} - ${element.priceOfProduct} - ${element.numberOfProduct}");
+    });
 
 
 }
   
   static printCustomerList(){
+    var i =0;
     customers.forEach((element) {
-        print("${element.index +1} - ${element.username}");
+      i++;
+      print("${i} - ${element.username}");
     });
   }
 }

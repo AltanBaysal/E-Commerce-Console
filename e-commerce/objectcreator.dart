@@ -9,89 +9,34 @@ class Objectcreator{
     addCreditCard();
 
     personnelcreator("Personnel1", "123456");
+    
     var i =0;
     ProductType.values.forEach((type) {
       i++;
-      String productname = type.toString().split('.').elementAt(1);
-      productcreator(type, productname, i, i*10);
+      String productName = type.toString().split('.').elementAt(1);
+      productcreator(type, productName, i, i*10);
     });
   }
   
-
   productcreator(ProductType productType,String productName,int numberOfProduct,double priceOfProduct){
-    int listIndex = products.length;
-
-    switch(productType){
-      case ProductType.Candy:{
-        Candy newproduct = Candy(productName, listIndex, numberOfProduct, priceOfProduct);
-        products.add(newproduct);
-      }
-      break;
-      case ProductType.Chips:{
-        Chips newproduct = Chips(productName, listIndex, numberOfProduct, priceOfProduct);
-        products.add(newproduct);
-      }
-      break;
-      case ProductType.Chocolate:{
-        Chocolate newproduct = Chocolate(productName, listIndex, numberOfProduct, priceOfProduct);
-        products.add(newproduct);
-      }
-      break;
-      case ProductType.Cookies:{
-        Cookies newproduct = Cookies(productName, listIndex, numberOfProduct, priceOfProduct);
-        products.add(newproduct);
-      }
-      break;
-      case ProductType.Crakers:{
-        Crakers newproduct = Crakers(productName, listIndex, numberOfProduct, priceOfProduct);
-        products.add(newproduct);
-      }
-      break;
-      case ProductType.FruitSnacks:{
-        FruitSnacks newproduct = FruitSnacks(productName, listIndex, numberOfProduct, priceOfProduct);
-        products.add(newproduct);
-      }
-      break;
-      case ProductType.IceCream:{
-        IceCream newproduct = IceCream(productName, listIndex, numberOfProduct, priceOfProduct);
-        products.add(newproduct);
-      }
-      break;
-      case ProductType.Juice:{
-        Juice newproduct = Juice(productName, listIndex, numberOfProduct, priceOfProduct);
-        products.add(newproduct);
-      }
-      break;
-      case ProductType.PopCorn:{
-        PopCorn newproduct = PopCorn(productName, listIndex, numberOfProduct, priceOfProduct);
-        products.add(newproduct);
-      }
-      break;
-      case ProductType.SnackNuts:{
-        SnackNuts newproduct = SnackNuts(productName, listIndex, numberOfProduct, priceOfProduct);
-        products.add(newproduct);
-      }
-      break;
-    }
+    products.add(productType.ProductCreator(productName, numberOfProduct, priceOfProduct));
   }
 
   customercreator(String username,double cash){
-    int listIndex = customers.length;
-    Customer newcustomer = Customer(cash, username,listIndex);
-    customers.add(newcustomer);
+    Customer newCustomer = Customer(cash, username);
+    customers.add(newCustomer);
   }
 
   personnelcreator(String username,String password){
-    int listIndex = personnels.length;
-    Personnel newpersonnel = Personnel(username, listIndex, password);
-    personnels.add(newpersonnel);
+    Personnel newPersonnel = Personnel(password,username);
+    personnels.add(newPersonnel);
   }
 
   addCreditCard(){
     customers.forEach((element) {
-      element.addCard(CardType.BankCard, 344541507145330, 1234, 500);
-      element.addCard(CardType.CreditCard, 344541507145331, 1234, 700);
-      element.addCard(CardType.CreditCard, 344541507145332, 1234, 800);
+      element.addCard(CardType.TBankCard, 344541507145330, 1234, 500);
+      element.addCard(CardType.TCreditCard, 344541507145331, 1234, 700);
+      element.addCard(CardType.TCreditCard, 344541507145332, 1234, 800);
     });
   }
 }

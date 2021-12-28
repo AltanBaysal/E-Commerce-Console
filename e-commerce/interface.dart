@@ -1,6 +1,4 @@
-import 'customeractions.dart';
 import 'main.dart';
-import 'personnelactions.dart';
 import 'user.dart';
 import 'dart:io';
 
@@ -15,7 +13,8 @@ class Interface {
       printAction();
       loginState = getActions();
 
-      if(loginState == State.selected) takeAction();
+      if(loginState == State.selected) selectedUserType.userChooser();
+      
       print("");
     }
   }
@@ -28,7 +27,6 @@ class Interface {
   }
   
   getActions(){
-    
     String? action = stdin.readLineSync();
 
     switch(action!.toLowerCase()){
@@ -52,18 +50,6 @@ class Interface {
 
   }
   
-  takeAction(){
-    switch(selectedUserType){
-      case UserType.customer:
-      newCustomeractions.actionInterface();
-      break;
-
-      case UserType.personnel:
-      newPersonnelactions.actionInterface();
-      break;
-    }
-  }
-
 }
 
 
