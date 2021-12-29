@@ -1,6 +1,6 @@
 import 'dart:io';
+import 'commonExtensions.dart';
 import 'funcs.dart';
-import 'main.dart';
 import 'product.dart';
 import 'user.dart';
 
@@ -32,13 +32,17 @@ class PersonnelActions{
   late SelectedPersonnelActions selectedPersonnelActions;
   
   actionInterface(){
-    State personnelActionState = State.unselected;
     bool isLoggin = login(); 
-    while(isLoggin && personnelActionState != State.exit){
+
+    while(isLoggin){
 
       printActions();
-      personnelActionState = getAction();
-      if(personnelActionState == State.selected) selectedPersonnelActions.takeAction();
+
+      String action = stdin.readLineSync().toString();
+      if(action == "exit") break;
+      SelectedPersonnelActions? selectedPersonnelActions = action.selectAction();
+
+      if(selectedPersonnelActions !=null) selectedPersonnelActions.takeAction();
     }
   }
 
@@ -59,9 +63,6 @@ class PersonnelActions{
       print("for exit type exit");
       
       print("Enter username");
-      personnels.forEach((element) {
-        print(element.username);
-      });
     
 
       String username = stdin.readLineSync() ?? "";
@@ -97,38 +98,6 @@ class PersonnelActions{
     print("For get customer debt press 3");
     print("For exit enter exit");
   }
-  
-  State getAction(){
-    
-    String? action = stdin.readLineSync();
-
-    switch (action!.toLowerCase()){
-      case "1":
-      selectedPersonnelActions = SelectedPersonnelActions.PrintProductTable;
-      return State.selected;
-
-      case "2":
-      selectedPersonnelActions = SelectedPersonnelActions.ChangeNumberOfProduct;
-      return State.selected;
-
-      case "3":
-      selectedPersonnelActions = SelectedPersonnelActions.CustomerDebt;
-      return State.selected;
-
-      case "exit":
-      return State.exit;
-
-      default :{
-        print("Enter valid action");
-        return State.unselected;
-      }
-      
-    }
-    
-
-  }
-
-
 
 
   //changenumber

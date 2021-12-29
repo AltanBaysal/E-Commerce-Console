@@ -1,6 +1,6 @@
 import 'dart:io';
 
-enum CardType{TCreditCard,TBankCard} 
+enum CardType{CreditCard,BankCard} 
 
 class Card {
   CardType cardType;
@@ -88,21 +88,21 @@ class Card {
 
 
 class CreditCard extends Card{
-  CreditCard(int _cardNumber,int _pin,double _balance,) :super(_cardNumber,_pin,_balance,CardType.TCreditCard);  
+  CreditCard(int _cardNumber,int _pin,double _balance,) :super(_cardNumber,_pin,_balance,CardType.CreditCard);  
 }
 
 class BankCard extends Card{
-  BankCard(int _cardNumber,int _pin,double _balance,) :super(_cardNumber,_pin,_balance,CardType.TBankCard); 
+  BankCard(int _cardNumber,int _pin,double _balance,) :super(_cardNumber,_pin,_balance,CardType.BankCard); 
 }
 
 
 extension CardExtension on CardType{
   Card cardCreate(int _cardNumber,int _pin,double _balance,){
     switch(this){
-      case CardType.TCreditCard:{
+      case CardType.CreditCard:{
         return CreditCard(_cardNumber, _pin, _balance);
       }
-      case CardType.TBankCard:{
+      case CardType.BankCard:{
         return BankCard(_cardNumber, _pin, _balance);
       }
     }

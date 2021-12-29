@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'commonExtensions.dart';
 import 'funcs.dart';
 import 'product.dart';
 import 'user.dart';
@@ -35,6 +36,7 @@ extension PaymentExtention on PaymentMethods{
     }
   }
 }
+
 
 
 CustomerActions newCustomerActions = CustomerActions();
@@ -128,35 +130,17 @@ class CustomerActions{
     double bill = desiredAmount*priceOfProduct;
 
     while(true){
-      PaymentMethods? selectedPaymentMethods;
       print("Amount to be paid $bill");
       print("Select a payment methods");
       print("for card press 1");
       print("for cash press 2  You have ${customers[indexOfCustomer].cash} cash");
       print("for debt press 3");
 
-      int action = int.tryParse(stdin.readLineSync().toString()) ?? -1;
 
-      switch (action){
-        case 1:
-          selectedPaymentMethods = PaymentMethods.Card;
-        break;
-
-        case 2:
-          selectedPaymentMethods = PaymentMethods.Cash;
-        break;
-
-        case 3:
-          selectedPaymentMethods = PaymentMethods.Debt;
-        break;
-
-        default :{
-          print("Enter valid action");
-        }
-      }
-
+      PaymentMethods? selectedPaymentMethods = stdin.readLineSync().toString().selectPaymentMethod();
       if(selectedPaymentMethods != null){
         if(buyProduct(selectedPaymentMethods,bill)) break;
+      
       }
     }
   }
@@ -165,6 +149,5 @@ class CustomerActions{
   bool buyProduct(PaymentMethods selectedPaymentMethod,double bill){
     return selectedPaymentMethod.buyProduct(bill, indexOfCustomer, desiredAmount, indexOfProduct);
   }
-
 }
 

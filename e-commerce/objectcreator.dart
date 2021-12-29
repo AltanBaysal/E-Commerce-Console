@@ -34,9 +34,9 @@ class Objectcreator{
 
   addCreditCard(){
     customers.forEach((element) {
-      element.addCard(CardType.TBankCard, 344541507145330, 1234, 500);
-      element.addCard(CardType.TCreditCard, 344541507145331, 1234, 700);
-      element.addCard(CardType.TCreditCard, 344541507145332, 1234, 800);
+      element.addCard(CardType.BankCard, 344541507145330, 1234, 500);
+      element.addCard(CardType.CreditCard, 344541507145331, 1234, 700);
+      element.addCard(CardType.CreditCard, 344541507145332, 1234, 800);
     });
   }
 }

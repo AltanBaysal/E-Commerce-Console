@@ -13,8 +13,3 @@ void main(List<String> args) {
 //Customer1
 //All cards' pin -> 1234
 
-
-
-//interfacede 34. satırdaki switch case geri dön
-//ürün almada fazla girince hata veriyor
-
